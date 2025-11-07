@@ -1,3 +1,5 @@
+@import "tailwindcss" reference;
+
 /* 打印设置 */
 
 /* 隐藏顶部导航，侧边栏，尾部 */
@@ -6,11 +8,11 @@
 .VPLocalNav,
 .VPDocAside,
 .VPSidebar {
-  @apply print:hidden !important;
+  @apply print:!hidden;
 }
 
 .Layout > footer {
-  @apply print:hidden !important;
+  @apply print:!hidden;
 }
 
 /* 调整边距 */

@@ -18,15 +18,15 @@ interface SideBar {
 
 /**
  * 生成 vitepress 所需的 sidebar 配置信息
- * @param {string} notesRootPath - md 笔记文件存放的根目录，将从该目录开始解析
+ * @param {string} postsRootPath - md 笔记文件存放的根目录，将从该目录开始解析
  * @param {string} pagePath - 要解析的目录名称
  * @param {string} prefix - 不包含根目录的前缀路由
  */
-function generate(notesRootPath: string, pagePath: string, prefix = "", depth = 0) {
+function generate(postsRootPath: string, pagePath: string, prefix = "", depth = 0) {
   if (depth >= 4) return [];
 
   // 构造绝对路径，用于读取目录下的所有文件信息
-  const dir = path.join(process.cwd(), notesRootPath, prefix, pagePath);
+  const dir = path.join(process.cwd(), postsRootPath, prefix, pagePath);
   // 构造相对路径，用于设置 sidebar 中的 link 字段
   const relDir = path.join(prefix, pagePath);
   // sidebar 初始化
@@ -45,7 +45,7 @@ function generate(notesRootPath: string, pagePath: string, prefix = "", depth = 
     const stats = statSync(filePath);
     // 对于目录
     if (stats.isDirectory()) {
-      const childItems = generate(notesRootPath, file, relDir, depth + 1);
+      const childItems = generate(postsRootPath, file, relDir, depth + 1);
       // 剔除不包含 md 文件的目录
       if (childItems[0].items!.length === 0) continue;
       sidebarSection.items!.push(...childItems);
@@ -88,11 +88,11 @@ function generate(notesRootPath: string, pagePath: string, prefix = "", depth = 
 
 /**
  * 获取不同页面的 sidebar 配置信息
- * @param {string} notesRootPath - md 笔记文件存放的根目录，将从该目录开始解析
+ * @param {string} postsRootPath - md 笔记文件存放的根目录，将从该目录开始解析
  * @param {string} pagePath - 要解析的目录名称
  */
-export function getSidebar(notesRootPath: string, pagePath: string) {
-  const sidebarConfig = generate(notesRootPath, pagePath);
+export function getSidebar(postsRootPath: string, pagePath: string) {
+  const sidebarConfig = generate(postsRootPath, pagePath);
   return {
     text: sidebarConfig[0].text,
     items: sidebarConfig[0].items,

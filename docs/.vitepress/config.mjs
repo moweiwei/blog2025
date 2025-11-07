@@ -24,7 +24,7 @@ export default defineConfig({
     // 顶部导航栏
     nav: [
       { text: "👋 About", link: "/AboutMe.md" },
-      { text: "💭 Blogs", link: "/Notes/index" },
+      { text: "💭 Blogs", link: "/posts/index" },
       { text: "🦄 Projects", link: "Projects.md" },
       { text: "👫 Friends", link: "Friends.md" },
     ],
@@ -36,7 +36,7 @@ export default defineConfig({
     },
     // 【文章页面左侧导航】
     sidebar: {
-      "/Notes/": getSidebar("/docs/src", "/Notes/"),
+      "/posts/": getSidebar("/docs/src", "/posts/"),
     },
     // 文章内导航栏标题
     outlineTitle: "导航栏",

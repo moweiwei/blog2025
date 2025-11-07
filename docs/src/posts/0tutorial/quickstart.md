@@ -51,7 +51,7 @@ npm run docs:dev
 这个命令将启动一个本地开发服务器，并且会进行热更新。如果一切顺利，你将在本地看到和本网站一模一样的界面。
 
 :::tip 🎉 现在，你可以开始编写你的博客了！
-【强烈建议】：请在 `/docs/src/Notes` 目录下编写你的 markdown 文件或是创建子目录。
+【强烈建议】：请在 `/docs/src/posts` 目录下编写你的 markdown 文件或是创建子目录。
 :::
 
 ## 下一步
@@ -81,7 +81,7 @@ npm run docs:dev
 │  │  └─ config.mjs // vitepress 配置入口
 │  └─ src           // 存放所有的笔记文件
 │     ├─ public     // 存放一些静态资源，它们在构建后将保留原始名称
-│     ├─ Notes      // markdown 笔记文件
+│     ├─ posts      // markdown 笔记文件
 │     ├─ index.md       // 主页
 │     ├─ AboutMe.md     // “关于”页
 │     ├─ Friends.md     // 友链页

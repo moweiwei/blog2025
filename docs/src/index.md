@@ -12,10 +12,10 @@ hero:
   actions:
     - theme: brand
       text: Get Start
-      link: /Notes/0tutorial/quickstart
+      link: /posts/0tutorial/quickstart
     - theme: alt
       text: View Document
-      link: /Notes/
+      link: /posts/
 
 features:
   - icon: 📝

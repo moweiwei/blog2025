@@ -69,7 +69,7 @@ export default defineConfig({
     // ...
     nav: [
       { text: "👋 About", link: "/AboutMe.md" },
-      { text: "💭 Blogs", link: "/Notes/index" },
+      { text: "💭 Blogs", link: "/posts/index" },
       { text: "🦄 Projects", link: "Projects.md" },
       { text: "👫 Friends", link: "Friends.md" },
     ],
@@ -100,8 +100,8 @@ export default defineConfig({
     // ...
     sidebar: {
       // 注意开头结尾均为反斜杠
-      // Notes 页面下的侧边栏，你可以为不同页面添加不同的侧边栏（此功能仍在测试中）
-      "/Notes/": getSidebar("/docs/src", "/Notes/"),
+      // posts 页面下的侧边栏，你可以为不同页面添加不同的侧边栏（此功能仍在测试中）
+      "/posts/": getSidebar("/docs/src", "/posts/"),
     },
   },
 });
@@ -130,10 +130,10 @@ export const fileName2Title: Record<string, string> = {
 这是本项目在 Vitepress 基础上新增的页面，用于汇总展示所有的文章信息。
 
 ::: warning
-🚧 很抱歉目前只能展示 `/docs/src/Notes` 目录下的所有文章信息
+🚧 很抱歉目前只能展示 `/docs/src/posts` 目录下的所有文章信息
 :::
 
-该部分配置文件位于 `/docs/src/Notes/index.md`
+该部分配置文件位于 `/docs/src/posts/index.md`
 
 以下是字段说明 & 示例代码：
 
@@ -161,14 +161,14 @@ hero:
 types:
   - name: "面经分享"
     desc: "interview experiences"
-    link: "/Notes/Interviews/"
+    link: "/posts/Interviews/"
     icon: "🏃"
   - name: "学习笔记"
     desc: "front-end technologies"
-    link: "/Notes/Learning/"
+    link: "/posts/Learning/"
   - name: "随想杂文"
     desc: "personal musings"
-    link: "/Notes/Thoughts/"
+    link: "/posts/Thoughts/"
     icon: "✨"
 flow: true
 ```

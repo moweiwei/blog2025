@@ -25,7 +25,7 @@ import { useData } from "vitepress";
 import BlogPart from "./BlogPart.vue";
 
 const { site } = useData();
-const sidebarData = site.value.themeConfig.sidebar["/Notes/"];
+const sidebarData = site.value.themeConfig.sidebar["/posts/"];
 
 /** TODO:
  * 重写归档页面，参考官方文档 API：

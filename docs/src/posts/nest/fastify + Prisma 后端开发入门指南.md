@@ -1,3 +1,10 @@
+---
+updateTime: "2025-11-07 16:20"
+desc: "专为前端转后端的初学者准备的详细教程"
+tags: "nest/fastify"
+outline: deep
+---
+
 # Fastify + Prisma 后端开发入门指南
 
 > 专为前端转后端的初学者准备的详细教程

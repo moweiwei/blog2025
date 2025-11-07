@@ -3,8 +3,8 @@
 layout: home
 
 hero:
-  name: "Easy VitePress Blog"
-  text: "轻松构建你的个人博客"
+  name: "moweiwei's Blog"
+  text: "Moweiwei Blog"
   tagline: "🚀Simple, robust and swift.Experience the enhanced VitePress for your blogging needs"
   image:
     src: /logo.png

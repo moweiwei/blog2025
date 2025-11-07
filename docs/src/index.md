@@ -7,7 +7,7 @@ hero:
   text: "Moweiwei Blog"
   tagline: "🚀Simple, robust and swift.Experience the enhanced VitePress for your blogging needs"
   image:
-    src: /logo.png
+    # src: /logo.png
     alt: VitePress
   actions:
     - theme: brand

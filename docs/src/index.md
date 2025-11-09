@@ -1,33 +1,47 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
 hero:
-  name: "moweiwei's Blog"
-  text: "Moweiwei Blog"
-  tagline: "🚀Simple, robust and swift.Experience the enhanced VitePress for your blogging needs"
+  name: "Moweiwei"
+  text: "资深前端开发工程师"
+  tagline: "精通 React、Vue、Nest、Node、TypeScript、Vite/Webpack、微前端、Tailwind/UnoCSS"
   image:
-    # src: /logo.png
-    alt: VitePress
+    alt: Moweiwei
   actions:
     - theme: brand
-      text: Get Start
-      link: /posts/0tutorial/quickstart
-    - theme: alt
-      text: View Document
+      text: 阅读博客
       link: /posts/
+    - theme: alt
+      text: 关于作者
+      link: /AboutMe
 
 features:
-  - icon: 📝
-    title: 专注于你的内容
-    details: 只需使用 Markdown 即可轻松创建精美的文档网站。
-  - icon: <svg xmlns="http://www.w3.org/2000/svg" width="30" viewBox="0 0 256 220.8"><path fill="#41B883" d="M204.8 0H256L128 220.8 0 0h97.92L128 51.2 157.44 0h47.36Z"/><path fill="#41B883" d="m0 0 128 220.8L256 0h-51.2L128 132.48 50.56 0H0Z"/><path fill="#35495E" d="M50.56 0 128 133.12 204.8 0h-47.36L128 51.2 97.92 0H50.56Z"/></svg>
-    title: 使用 Vue 进行定制
-    details: 在 Markdown 中使用 Vue 语法和组件，或使用 Vue 构建自定义主题。.
-  - icon: 🚀
-    title: 快速发布网站
-    details: 使用静态 HTML 快速初始加载，客户端路由进行快速加载后导航。
-  - icon: 🦄
-    title: 更加丰富的功能
-    details: 提供定制化模板轻松展示友情链接与开源项目介绍，并支持导出更加美观的 PDF 文件。
+  - icon: 🛠️
+    title: 技术与优势
+    details: 精通 React、Vue
+  - icon: ☁️
+    title: 云计算背景
+    details: 深耕 SaaS、容器云，熟悉 Kubernetes/容器化，CKA
+  - icon: 📚
+    title: 博客主题
+    details: 聚焦云原生前端、微前端架构、工程效率与手记，记录实践与生活
+  - icon: 📬
+    title: 联系方式
+    details: moweiwei6@gmail.com
 ---
+
+<!-- ## 最近经历
+
+- 2019.02-2025.09 · 浙江九州未来信息科技 · 前端基建（Monorepo、微前端、Cypress E2E）与多云产品研发  
+- 2017.07-2019.02 · 东方网力科技 · 智慧城市/公安大数据可视化与大屏交互
+
+## 项目速记
+
+- Animbus CaaS Console：Qiankun 微前端 + pnpm workspace，统一组件库与多语言、并行构建加速交付  
+- Mercedes-Benz CBDT Shield：Vue3 + UnoCSS + Workbench，沉淀二次封装组件与数据库纳管全链路  
+- KubeClipper Console：React + Cypress E2E，推动 CNCF 沙盒落地与核心模块组件化
+
+## 博客导览
+
+- 分享云原生前端工程化、微前端架构、性能与自动化测试实践  
+- 记录职业成长、社区贡献与项目复盘，偶尔聊生活 -->

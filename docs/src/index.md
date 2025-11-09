@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: "Moweiwei"
-  text: "资深前端开发工程师"
+  text: "Moweiwei Blog"
   tagline: "精通 React、Vue、Nest、Node、TypeScript、Vite/Webpack、微前端、Tailwind/UnoCSS"
   image:
     alt: Moweiwei

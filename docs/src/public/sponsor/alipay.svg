@@ -1,0 +1,17 @@
+<svg width="320" height="320" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Alipay QR placeholder">
+  <defs>
+    <linearGradient id="alipayGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4f9dff" />
+      <stop offset="100%" stop-color="#0062ff" />
+    </linearGradient>
+    <pattern id="grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M0 0h24v24H0z" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1" />
+    </pattern>
+  </defs>
+  <rect width="320" height="320" rx="32" fill="url(#alipayGradient)" />
+  <rect x="28" y="28" width="264" height="264" rx="24" fill="rgba(255,255,255,.22)" stroke="rgba(255,255,255,.4)" stroke-width="2" />
+  <rect x="84" y="84" width="152" height="152" rx="12" fill="url(#grid)" />
+  <rect x="108" y="108" width="104" height="104" rx="10" fill="#fff" />
+  <text x="50%" y="250" text-anchor="middle" font-family="'SF Pro Display', 'PingFang SC', sans-serif" font-size="24" fill="#fff">支付宝</text>
+  <text x="50%" y="278" text-anchor="middle" font-family="'SF Pro Display', 'PingFang SC', sans-serif" font-size="16" fill="rgba(255,255,255,.7)">Alipay</text>
+</svg>

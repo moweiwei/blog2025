@@ -1,0 +1,17 @@
+<svg width="320" height="320" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WeChat Pay QR placeholder">
+  <defs>
+    <linearGradient id="wechatGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00c27a" />
+      <stop offset="100%" stop-color="#00945b" />
+    </linearGradient>
+    <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2" fill="rgba(255,255,255,.4)" />
+    </pattern>
+  </defs>
+  <rect width="320" height="320" rx="32" fill="url(#wechatGradient)" />
+  <rect x="24" y="24" width="272" height="272" rx="20" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.4)" stroke-width="2" />
+  <rect x="84" y="84" width="152" height="152" fill="url(#dots)" rx="12" />
+  <rect x="106" y="106" width="108" height="108" fill="#fff" rx="8" />
+  <text x="50%" y="258" text-anchor="middle" font-family="'SF Pro Display', 'PingFang SC', sans-serif" font-size="24" fill="#fff">微信支付</text>
+  <text x="50%" y="286" text-anchor="middle" font-family="'SF Pro Display', 'PingFang SC', sans-serif" font-size="16" fill="rgba(255,255,255,.7)">WeChat Pay</text>
+</svg>

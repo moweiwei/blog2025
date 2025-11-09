@@ -23,9 +23,10 @@ export default defineConfig({
     logo: "/logo.svg",
     // 顶部导航栏
     nav: [
-      { text: "👋 About", link: "/AboutMe.md" },
-      { text: "💭 Blogs", link: "/posts/index" },
+      { text: "👋 关于", link: "/AboutMe.md" },
+      { text: "💭 笔记", link: "/posts/index" },
       { text: "🗂 归档", link: "/Archive" },
+      { text: "☕️ 赞助", link: "/Sponsor" },
     ],
     // 顶部导航栏左侧的社交平台跳转
     socialLinks: [{ icon: "github", link: "https://github.com/moweiwei" }],

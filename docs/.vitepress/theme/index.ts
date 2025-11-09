@@ -8,10 +8,16 @@ import "./print.css";
 import LinkCard from "../components/LinkCard.vue";
 import HText from "../components/HText.vue";
 import mediumZoom from "medium-zoom";
-import { onMounted, watch, nextTick } from "vue";
+import { h, onMounted, watch, nextTick } from "vue";
+import BackToTop from "../components/BackToTop.vue";
 
 export default {
   extends: DefaultTheme,
+  Layout() {
+    return h(DefaultTheme.Layout, null, {
+      "layout-bottom": () => h(BackToTop),
+    });
+  },
   enhanceApp(ctx) {
     ctx.app.component("LinkCard", LinkCard);
     ctx.app.component("HText", HText);

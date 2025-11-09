@@ -1,0 +1,447 @@
+---
+updateTime: "2022-06-22 18:41"
+date: "2022-06-22"
+desc: "记录一份 21 天前端面试打卡笔记与问题拆解。"
+tags: "interview/frontend"
+outline: deep
+---
+
+---
+
+第 1 天（2022.2.28）
+
+## 1. 什么时候使用状态管理器？
+
+1. 组件状态要在多个组件共享时
+2. 某个组件状态需要在任何地方可以拿到
+3. 一个组件需要改变全局状态时
+4. 一个组件需要改变另一个组件状态时
+5. 组件状态提升提升不能满足需求时，层级过多时。
+
+## 2. render 函数中 return 如果没有使用()会有什么问题？
+
+避免遇到自动插入分号陷阱。
+
+我们在使用 JSX 语法书写 react 代码时，babel 会将 JSX 语法编译成 js，同时会在每行自动添加分号（；），如果 return 后换行了，那么就会变成 return；
+一般情况下会报错：
+
+Nothing was returned from render. This usually means a return statement is missing. Or, to render
+nothing, return null. 上面这段英文翻译成中文：
+
+渲染没有返回任何内容。这通常意味着缺少 return 语句。或者，为了不渲染，返回 null。 为了代码可读性我们一般会在 return 后面添加括号这样代码可以折行书写，否则就在 return
+后面紧跟着语句，这样也是可以的。
+
+举两个正确的书写例子：
+
+```jsx
+const Nav = () => {
+  return (
+    <nav className="c_navbar">
+      { some jsx magic here }
+    </nav>
+    )
+  }
+
+const Nav = () => {
+return <nav className="c_navbar">
+    { some jsx magic here }
+  </nav>
+}
+```
+
+错误的写法：
+
+```jsx
+const Nav = () => {
+  return
+    <nav className="c_navbar">
+      { some jsx magic here }
+    </nav>
+}
+```
+
+## 3. componentWillUpdate 可以直接修改 state 的值吗？
+
+直接修改不可以，但是加上条件就可以。
+
+文档原文：“你也可以在 componentDidUpdate() 中直接调用
+setState()，但请注意它必须被包裹在一个条件语句里，正如上述的例子那样进行处理，否则会导致死循环。它还会导致额外的重新渲染，虽然用户不可见，但会影响组件性能。”
+
+componentWillReceiveProps 同理
+
+## 4. 说说你对 React 的渲染原理的理解
+
+1. React 会调用 React.render()构建一颗 DOM 树，生成虚拟 dom。
+2. 通过改变 state 或 props 触发更新。
+3. 对比新旧虚拟 dom，diff 算法，深度优先，将实际需要改变的反应到真实 dom。
+
+---
+
+第 2 天（2022.3.1）
+
+## 5. 什么渲染劫持？
+
+一般和高阶组件（HOC）一起解释。
+
+高阶组件在 render 的时候可以做其他操作，从而控制原组件的渲染输出，这种改变原组件渲染的方式称为 渲染劫持。
+
+在高阶组件中，组合渲染和条件渲染都是渲染劫持的一种，通过反向继承，不仅可实现渲染劫持，还可以增强原组件 render 函数。
+
+除了 HOC，当新写一个组件，继承自一个已有的组件，可以随便修改 render 函数，使用 state、props 等改变原组件的渲染，都叫渲染劫持。
+
+PS: HOC 反向继承
+
+TODO：
+
+## 6. React Intl是什么原理？
+
+React Intl 用途是国际化库，提供组件、日期等国际化方法。
+
+做国际化就类似于字体文件，通过切换语言，加载不同语言包到本地.
+
+最外层包一个Provider。调用库中方法，完成国际化。
+
+前端国际化核心步骤有两步：
+
+- 创建资源文件，以 key-value 方式存储
+- 加载资源文件，将页面上 key 的内容替换为相关 value
+
+## 7. 怎么实现React组件的国际化呢？
+
+使用 i18next 以及 react-i18next 配合 i18next-scanner，通过 grunt 跑 task 自动扫描生成 json 文件。
+
+现在大厂比较常用的方案是，使用AST，每次开发完新版本，通过AST去扫描所有的代码，找出代码中的中文，以中文为key，调用智能翻译服务，去帮项目自动生成json文件。这样，再也不需要人为去维护json文件，一切都依赖工具进行自动化。
+
+---
+
+第 3 天（2022.3.2）
+
+## 8. 说说Context有哪些属性？
+
+context属于一种解决组件间层级过多传递数据的问题，避免了层层嵌套的通过props传递的形式，同时对于不需要使用到redux时，是一种解决方案。
+
+Context.Provider：生产者，数据提供方；通过value属性来定义需要被传递的数据
+Context.Consumer：消费者，数据获取方；根据是函数组件还是class组件，有不同的使用形式；class组件可以指定contextType来确定要使用哪一个context对象的值，函数组件需要使用回调函数的形式来获取context的值；需要显示的指定context对象；
+
+## 9. 怎么使用Context开发组件？
+
+```jsx
+const themes = {
+  light: {
+    foreground: "#000000",
+    background: "#eeeeee"
+  },
+  dark: {
+    foreground: "#ffffff",
+    background: "#222222"
+  }
+};
+// 首先创建一个 context 对象这里命名为：ThemeContext
+const ThemeContext = React.createContext(themes.light);
+
+// 创建一个祖先组件组件 内部使用Provier 这个对象创建一个组件 其中 value 属性是真实传递的属性
+function App() {
+  return (
+    <ThemeContext.Provider value={themes.dark}>
+      <Toolbar />
+    </ThemeContext.Provider>
+  );
+}
+
+// 渲染 button 组件的外层包裹的属性
+function Toolbar(props) {
+  return (
+    <div>
+      <ThemedButton />
+    </div>
+  );
+}
+
+// 在 Toolbar 中渲染的button 组件 使用 useContext，将 value 值跨组件传递给 // ThemeButton 组件
+function ThemedButton() {
+  const theme = useContext(ThemeContext);
+  return (
+    <button style={{ background: theme.background, color: theme.foreground }}>
+      I am styled by theme context!
+    </button>
+  );
+}
+```
+
+## 10. 为什么React并不推荐我们优先考虑使用Context？
+
+1、Context目前还处于实验阶段，可能会在后面的发行版本中有很大的变化，事实上这种情况已经发生了，所以为了避免给今后升级带来大的影响和麻烦，不建议在app中使用context。
+2、尽管不建议在app中使用context，但是独有组件而言，由于影响范围小于app，如果可以做到高内聚，不破坏组件树之间的依赖关系，可以考虑使用context
+3、对于组件之间的数据通信或者状态管理，有效使用props或者state解决，然后再考虑使用第三方的成熟库进行解决，以上的方法都不是最佳的方案的时候，在考虑context。
+4、context的更新需要通过setState()触发，但是这并不是很可靠的，Context支持跨组件的访问，但是如果中间的子组件通过一些方法不影响更新，比如
+shouldComponentUpdate() 返回false 那么不能保证Context的更新一定可以使用Context的子组件，因此，Context的可靠性需要关注。
+
+---
+
+第 4 天（2022.3.3）
+
+## 11. childContextTypes是什么？它有什么用？
+
+childContextTypes用来定义context数据类型，该api从16.3开始已被废弃
+
+使用方式
+
+```jsx
+class MessageList extends React.Component {
+  getChildContext() {
+    return {color: "purple"};
+  }
+
+  render() {
+    return <div>MessageList</div>;
+  }
+}
+
+MessageList.childContextTypes = {
+  color: PropTypes.string
+};
+```
+
+## 12. Consumer向上找不到Provider的时候怎么办？
+
+当consumer向上层找不到provider时，此时就会取创建context时传给createContext的那个值，也就是当前context对象的默认值，在定义provider时的value中的值不是默认值，而是表示需要被传递的值.
+
+---
+
+第 5 天（2022.3.4）
+
+## 13. 说说你对windowing的了解
+
+展示长列表
+如果你的应用会渲染大量的列表数据，我们建议使用一种称为‘windowing’的技术，这种技术下在任何给定的时间内只会渲染一小部分数据列表，并可以减少列表项的重复渲染（即再次渲染已经渲染过的数据）。
+
+react-window和react-virtualized都是流行的使用windowing技术的库，他们都提供了一系列可重用的组件，这些组件能够帮助你以最好的性能展示列表以及表格数据
+
+## 14. 举例说明React的 portal 有哪些运用场景？
+
+portal可以将内容插入到除了父节点的dom之外的地方去渲染，所以modal是一个通过portal实现的典型例子；并且对于事件绑定，因为使用了事件冒泡，所以并不用担心被渲染到父组件结构之外的内容，不能去监听事件
+
+## 15. 你有用过React的插槽(Portals)吗？怎么用？
+
+1、首先简单的介绍下react中的插槽（Portals），通过ReactDOM.createPortal(child,
+container)创建，是ReactDOM提供的接口，可以实现将子节点渲染到父组件DOM层次结构之外的DOM节点。 2、第一个参数（child）是任何可渲染的 React
+子元素，例如一个元素，字符串或 片段(fragment)。第二个参数（container）则是一个 DOM 元素。 3、对于 portal 的一个典型用例是当父组件有 overflow: hidden
+或 z-index 样式，但你需要子组件能够在视觉上 “跳出(break out)” 其容器。例如，对话框、hovercards以及提示框。所以一般react组件里的模态框，就是这样实现的。
+
+如果一个子组件的真实DOM结构必须渲染到当前组件外，但又想保留这两者的父子关系，就可以用Protals。
+
+```jsx
+const Modal = (props) => {
+  const modal = document.body.createElement('div');
+  document.appendChild(modal);
+  useEffect(() => {
+    return () => {
+      document.body.removeChild(modal);
+    }
+  }, []);
+  return React.createPortal(this.props.children, modal);
+}
+const Parent = () => {
+  const [sum, setSum] = useState(0);
+  const add = () => setSum(sum + 1);
+  return <div onClick={add}>
+    <Modal>加一</Modal>
+  </div>
+}
+```
+
+---
+
+第 6 天（2022.3.5）
+
+## 16. React的严格模式有什么用处？
+
+StrictMode 目前有助于：
+
+- 识别不安全的生命周期
+- 关于使用过时字符串 ref API 的警告
+- 关于使用废弃的 findDOMNode 方法的警告
+- 检测意外的副作用
+- 检测过时的 context API
+
+可以为程序的任何部分使用严格模式
+
+```jsx
+import React from 'react';
+
+function ExampleApplication() {
+  return (
+    <div>
+      <Header />
+      <React.StrictMode>
+        <div>
+          <ComponentOne />
+          <ComponentTwo />
+        </div>
+      </React.StrictMode>
+      <Footer />
+    </div>
+  );
+}
+// 不会对 Header 和 Footer 组件运行严格模式检查。但是，ComponentOne 和 ComponentTwo 以及它们的所有后代元素都将进行检查。
+```
+
+## 17. React如何进行代码拆分？拆分的原则是什么？
+
+react的拆分前提是代码目录设计规范，模块定义规范，代码设计规范，符合程序设计的一般原则，例如高内聚、低耦合等等。
+
+在我们的react项目中： 1、在 api 层面我们单独封装，对外暴露http请求的结果。 2、数据层我们使用的react-redux 异步中间件使用的是redux-thunk
+分装处理异步请求，合业务逻辑处理。 3、视图层，尽量使用 redux 层面的传递过来的数据，修改逻辑 也是重新触发action 更改props。 4、静态类型的资源单独放置
+5、公共组件、高阶组件、插件单独放置 6、工具类文件单独放置
+
+## 18. React组件的构造函数有什么作用？
+
+官网中，构造函数仅用于以下两种情况：
+
+- 通过给 this.state 赋值对象来初始化内部 state。
+- 为事件处理函数绑定实例
+
+```jsx
+constructor(props) {
+  super(props);
+  // 不要在这里调用 this.setState()
+  this.state = { counter: 0 };
+  this.handleClick = this.handleClick.bind(this);
+}
+```
+
+避免将 props 的值复制给 state！这是一个常见的错误：
+
+```jsx
+constructor(props) {
+ super(props);
+ // 不要这样做
+ this.state = { color: props.color };
+}
+```
+
+如此做毫无必要（你可以直接使用 this.props.color），同时还产生了 bug（更新 prop 中的 color 时，并不会影响 state）。
+
+## 19. React组件的构造函数是必须的吗？
+
+function组件不用考虑构造函数； 对于class组件，如果不写构造函数，默认会被隐式调用.
+
+对于无状态组件，内部没有维护自己的state，只接收外部传入的props 是不需要声明构造函数的.
+
+---
+
+第 7 天（2022.3.6）
+
+## 20. React中在哪捕获错误？
+
+可以使用错误边界组件来捕获异常；这样可以使用替代ui来代替错误位置的渲染；而不是让程序崩溃； 主要来捕获生命周期异常，渲染中的异常
+
+使用 static getDerivedStateFromError() 渲染备用 UI ，使用 componentDidCatch() 打印错误信息
+
+定义错误边界当做常规组件包裹ui组件, 官网例子：
+
+```jsx
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    // 更新 state 使下一次渲染能够显示降级后的 UI
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // 你同样可以将错误日志上报给服务器
+    logErrorToMyService(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // 你可以自定义降级后的 UI 并渲染
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children; 
+  }
+}
+```
+
+```jsx
+<ErrorBoundary>
+  <MyWidget />
+</ErrorBoundary>
+```
+
+但是错误边界不会捕获 :
+
+```jsx
+try{}catch(err){}
+///异步代码（例如 setTimeout 或 requestAnimationFrame 回调函数）
+///服务端渲染
+///它自身抛出来的错误（并非它的子组件)
+```
+
+## 21. React怎样引入svg的文件？
+
+方法1： 这种写法会由webpack转为url方式引入。
+
+```jsx
+// svg png等类型图片
+import logo from './logo.svg';
+//...
+<img src={logo} className="App-logo" alt="logo" />
+//...
+```
+
+方法2： 这种方式仅对SVG图片生效，将svg看作组件导入：
+
+```jsx
+// ...
+import { ReactComponent as Logo } from './logo.svg'
+// ...
+<Logo />
+```
+
+## 22. 在React中你有经常使用常量吗？
+
+在redux的action文件里面定义不同的行为可能会使用常量的形式。
+
+---
+
+第 8 天（2022.3.7）
+
+## 23. 为什么说React中的props是只读的？
+
+往单向数据流上答： 保证react的单向数据流的设计模式，使状态更可预测。
+如果允许自组件修改，那么一个父组件将状态传递给好几个子组件，这几个子组件随意修改，就完全不可预测，不知道在什么地方修改了状态。 所以我们必须像纯函数一样保护 props 不被修改
+
+## 24. 如果组件的属性没有传值，那么它的默认值是什么？
+
+[官网](https://zh-hans.reactjs.org/docs/jsx-in-depth.html#props-default-to-true)，如果你没给 prop 赋值，它的默认值是
+true。以下两个 JSX 表达式是等价的：
+
+```jsx
+<MyTextBox autocomplete />
+
+<MyTextBox autocomplete={true} />
+```
+
+通常，我们不建议不传递 value 给 prop，因为这可能与 ES6 对象简写混淆，{foo} 是 {foo: foo} 的简写，而不是 {foo: true}。这样实现只是为了保持和 HTML
+中标签属性的行为一致。
+
+## 25. `super()`和`super(props)`有什么区别？
+
+react 中的class 是基于es6的规范实现的, 继承是使用extends关键字实现继承的，子类必须在constructor()中调用super() 方法否则新建实例就会报错，报错的原因是
+子类是没有自己的this对象的，它只能继承父类的this对象，然后对其进行加工，而super()就是将父类中的this对象继承给子类的，没有super() 子类就得不到this对象。
+
+如果你使用了constructor就必须写super() 这个是用来初始化this的，可以绑定事件到this上 如果你想要在constructor中使用this.props,就必须给super添加参数
+super(props) 注意，无论有没有 constructor，在render中的this.props都是可以使用的，这是react自动附带的 如果没有用到constructor
+是可以不写的，react会默认添加一个空的constroctor.
+
+super 指的是父类（即超类）的构造函数。
+
+在调用父类的构造函数之前，你是不能在 constructor 中使用 this 关键字的.
+
+参考 [why-do-we-write-super-props](https://overreacted.io/zh-hans/why-do-we-write-super-props/)

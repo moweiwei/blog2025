@@ -1,0 +1,88 @@
+---
+updateTime: "2022-02-27 15:08"
+date: "2022-02-27"
+desc: "解析 Ant Design useMergedState 的受控与非受控合并策略与常见用法。"
+tags: "interview/antd"
+outline: deep
+---
+
+用法与 useState 类似，区别是 如果 props 提供 value 值，将会用 value 值来初始化 state 状态。
+
+## 用法
+
+```ts
+const [innerChecked, setInnerChecked] = useMergedState<boolean>(false, {
+      value: checked,
+      defaultValue: defaultChecked,
+    });
+```
+
+## 源码分析
+
+```ts
+import * as React, { useState } from 'react';
+
+/**
+* Similar to `useState` but will use props value if provided.
+ */
+export default function useMergedState<T, R = T>(
+  defaultStateValue: T | (() => T),
+  option?: {
+    defaultValue?: T | (() => T);
+    value?: T;
+    onChange?: (value: T, prevValue: T) => void;
+    postState?: (value: T) => T;
+  },
+): [R, (value: T, ignoreDestroy?: boolean) => void] {
+  const { defaultValue, value, onChange, postState } = option || {};
+  // 声明内部 value 值
+  const [innerValue, setInnerValue] = useState<T>(() => {
+    // value 存在，用 value 初始化 innerValue 的值
+    if (value !== undefined) {
+      return value;
+    }
+    // 同上
+    if (defaultValue !== undefined) {
+      return typeof defaultValue === 'function'
+        ? (defaultValue as any)()
+        : defaultValue;
+    }
+    // defaultStateValue 优先级最低
+    return typeof defaultStateValue === 'function'
+      ? (defaultStateValue as any)()
+      : defaultStateValue;
+  });
+
+  let mergedValue = value !== undefined ? value : innerValue;
+  if (postState) {
+    // 数据处理
+    mergedValue = postState(mergedValue);
+  }
+
+  // 封装内部的 setState
+  const onChangeRef = React.useRef(onChange);
+  onChangeRef.current = onChange;
+
+  const triggerChange = React.useCallback(
+    (newValue: T, ignoreDestroy?: boolean) => {
+      setInnerValue(newValue, ignoreDestroy);
+      if (mergedValue !== newValue && onChangeRef.current) {
+        onChangeRef.current(newValue, mergedValue);
+      }
+    },
+    [mergedValue, onChangeRef],
+  );
+
+  // Effect of reset value to `undefined`
+  const prevValueRef = React.useRef(value);
+  React.useEffect(() => {
+    if (value === undefined && value !== prevValueRef.current) {
+      setInnerValue(value);
+    }
+
+    prevValueRef.current = value;
+  }, [value]);
+
+  return [mergedValue as unknown as R, triggerChange];
+}
+```

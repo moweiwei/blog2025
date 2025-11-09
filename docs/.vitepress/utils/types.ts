@@ -14,6 +14,8 @@ export interface Post {
     time: number;
     string: string;
   };
+  tags: string[];
+  categories: string[];
 }
 // Frontmatter 默认属性
 interface DefaultFrontmatter {

@@ -1,0 +1,281 @@
+---
+updateTime: "2022-01-14 09:32"
+date: "2022-01-14"
+desc: "梳理 ProTable useFetchData 源码流程与扩展点，帮助理解数据请求生命周期。"
+tags: "interview/antd"
+outline: deep
+---
+
+## 源码分析
+
+```ts
+/**
+ * 合并用户配置的分页参数和默认值
+ *
+ * @param param0
+ */
+const mergeOptionAndPageInfo = ({ pageInfo }: UseFetchProps) => {
+  if (pageInfo) {
+    const { current, defaultCurrent, pageSize, defaultPageSize } = pageInfo;
+    return {
+      current: current || defaultCurrent || 1,
+      total: 0,
+      pageSize: pageSize || defaultPageSize || 20,
+    };
+  }
+  return { current: 1, total: 0, pageSize: 20 };
+};
+```
+
+```ts
+const useFetchData = (
+  getData: undefined | ((params?: { pageSize: number; current: number }) => Promise<T>), // 即 protable 中的的 fetchData，即 request
+  defaultData: any[] | undefined, // 表格默认数据
+  options: UseFetchProps,
+): UseFetchDataAction => {
+  // 组件卸载标记， true 表示组件已卸载
+  const umountRef = useRef<boolean>(false);
+
+  const { onLoad, manual, polling, onRequestError, debounceTime = 20 } = options || {};
+
+  /** 是否首次加载的指示器 */
+  const manualRequestRef = useRef<boolean>(manual);
+
+  /** 轮询的setTime ID 存储 */
+  const pollingSetTimeRef = useRef<any>();
+  // useMountMergeState 类似 useState, props 提供值，用 props 值来初始化 state。而且挂载后执行。
+  const [list, setList] = useMountMergeState<any[] | undefined>(defaultData, {
+    value: options?.dataSource,
+    onChange: options?.onDataSourceChange,
+  });
+
+  // 表格 loading 状态
+  const [tableLoading, setLoading] = useMountMergeState<UseFetchDataAction['loading']>(false, {
+    value: options?.loading,
+    onChange: options?.onLoadingChange,
+  });
+
+  // 是否正在请求进行中标记
+  const requesting = useRef(false);
+
+  const [pageInfo, setPageInfoState] = useMountMergeState<PageInfo>(
+    () => mergeOptionAndPageInfo(options),
+    {
+      onChange: options?.onPageInfoChange,
+    },
+  );
+
+  // useRefFunction 保持函数引用，避免重复声明
+  const setPageInfo = useRefFunction((changePageInfo: PageInfo) => {
+    if (
+      changePageInfo.current !== pageInfo.current ||
+      changePageInfo.pageSize !== pageInfo.pageSize ||
+      changePageInfo.total !== pageInfo.total
+    ) {
+      setPageInfoState(changePageInfo);
+    }
+  });
+
+  // 轮询 loading 状态
+  const [pollingLoading, setPollingLoading] = useMountMergeState(false);
+
+  // Batching update  https://github.com/facebook/react/issues/14259
+  const setDataAndLoading = (newData: T[], dataTotal: number) => {
+    setList(newData);
+
+    if (pageInfo?.total !== dataTotal) {
+      setPageInfo({
+        ...pageInfo,
+        total: dataTotal || newData.length,
+      });
+    }
+  };
+
+  // pre state
+  const prePage = usePrevious(pageInfo?.current);
+  const prePageSize = usePrevious(pageInfo?.pageSize);
+  const prePolling = usePrevious(polling);
+
+  // params、filter、sort 等查询参数相关
+  const { effects = [] } = options || {};
+
+  /**
+   * 不这样做会导致状态不更新
+   *
+   * https://github.com/ant-design/pro-components/issues/4390
+   */
+  const requestFinally = useRefFunction(() => {
+    requestAnimationFrame(() => {
+      setLoading(false);
+      setPollingLoading(false);
+    });
+  });
+  /** 请求数据 */
+  const fetchList = async (isPolling: boolean) => {
+    if (tableLoading || requesting.current || !getData) {
+      return [];
+    }
+
+    // 需要手动触发的首次请求
+    if (manualRequestRef.current) {
+      manualRequestRef.current = false;
+      return [];
+    }
+    if (!isPolling) {
+      setLoading(true);
+    } else {
+      setPollingLoading(true);
+    }
+
+    requesting.current = true;
+    const { pageSize, current } = pageInfo || {};
+    try {
+      const pageParams =
+        options?.pageInfo !== false
+          ? {
+              current,
+              pageSize,
+            }
+          : undefined;
+
+      const { data = [], success, total = 0, ...rest } = (await getData(pageParams)) || {};
+      // 如果失败了，直接返回，不走剩下的逻辑了
+      if (success === false) return [];
+
+      const responseData = postDataPipeline<T[]>(
+        data!,
+        [options.postData].filter((item) => item) as any,
+      );
+      setDataAndLoading(responseData, total);
+      onLoad?.(responseData, rest);
+      return responseData;
+    } catch (e) {
+      // 如果没有传递这个方法的话，需要把错误抛出去，以免吞掉错误
+      if (onRequestError === undefined) throw new Error(e as string);
+      if (list === undefined) setList([]);
+      onRequestError(e as Error);
+    } finally {
+      requesting.current = false;
+      requestFinally();
+    }
+
+    return [];
+  };
+
+  const fetchListDebounce = useDebounceFn(async (isPolling: boolean) => {
+    if (pollingSetTimeRef.current) {
+      clearTimeout(pollingSetTimeRef.current);
+    }
+    const msg = await fetchList(isPolling);
+
+    // 把判断要不要轮询的逻辑放到后面来这样可以保证数据是根据当前来
+    // 放到请求前面会导致数据是上一次的
+    const needPolling = runFunction(polling, msg);
+
+    // 如果需要轮询，搞个一段时间后执行
+    // 如果解除了挂载，删除一下
+    if (needPolling && !umountRef.current) {
+      pollingSetTimeRef.current = setTimeout(() => {
+        fetchListDebounce.run(needPolling);
+        // 这里判断最小要2000ms，不然一直loading
+      }, Math.max(needPolling, 2000));
+    }
+    return msg;
+  }, debounceTime || 10);
+
+  // 如果轮询结束了，直接销毁定时器
+  useEffect(() => {
+    if (!polling) {
+      clearTimeout(pollingSetTimeRef.current);
+    }
+    if (!prePolling && polling) {
+      fetchListDebounce.run(true);
+    }
+    return () => {
+      clearTimeout(pollingSetTimeRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [polling]);
+
+  useLayoutEffect(() => {
+    umountRef.current = false;
+
+    return () => {
+      umountRef.current = true;
+    };
+  }, []);
+
+  /** PageIndex 改变的时候自动刷新 */
+  useEffect(() => {
+    const { current, pageSize } = pageInfo || {};
+    // 如果上次的页码为空或者两次页码等于是没必要查询的
+    // 如果 pageSize 发生变化是需要查询的，所以又加了 prePageSize
+    if ((!prePage || prePage === current) && (!prePageSize || prePageSize === pageSize)) {
+      return;
+    }
+
+    if ((options.pageInfo && list && list?.length > pageSize) || 0) {
+      return;
+    }
+
+    // 如果 list 的长度大于 pageSize 的长度
+    // 说明是一个假分页
+    // (pageIndex - 1 || 1) 至少要第一页
+    // 在第一页大于 10
+    // 第二页也应该是大于 10
+    if (current !== undefined && list && list.length <= pageSize) {
+      fetchListDebounce.run(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageInfo?.current]);
+
+  // pageSize 修改后返回第一页
+  useEffect(() => {
+    if (!prePageSize) {
+      return;
+    }
+    fetchListDebounce.run(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageInfo?.pageSize]);
+
+  // 深比较，参数变化重新触发请求
+  useDeepCompareEffect(() => {
+    fetchListDebounce.run(false);
+    if (!manual) {
+      manualRequestRef.current = false;
+    }
+    return () => {
+      fetchListDebounce.cancel();
+    };
+  }, [...effects, manual]);
+
+  return {
+    dataSource: list!,
+    setDataSource: setList,
+    loading: tableLoading,
+    reload: async () => {
+      await fetchListDebounce.run(false);
+    },
+    pageInfo,
+    pollingLoading,
+    reset: async () => {
+      const { pageInfo: optionPageInfo } = options || {};
+      const { defaultCurrent = 1, defaultPageSize = 20 } = optionPageInfo || {};
+      const initialPageInfo = {
+        current: defaultCurrent,
+        total: 0,
+        pageSize: defaultPageSize,
+      };
+      setPageInfo(initialPageInfo);
+    },
+    setPageInfo: async (info) => {
+      setPageInfo({
+        ...pageInfo,
+        ...info,
+      });
+    },
+  };
+};
+
+export default useFetchData;
+```

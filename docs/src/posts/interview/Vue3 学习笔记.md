@@ -1,0 +1,218 @@
+---
+updateTime: "2023-07-08 19:25"
+date: "2023-07-08"
+desc: "概览 Vue3 核心特性、响应式 API 与实践心得。"
+tags: "interview/vue"
+outline: deep
+---
+
+## Vue 和 React 数据驱动原理对比
+
+Vue1 解决方案是使用响应式，初始化的时候，watcher 监听数据的每个属性，数据发生变化的时候，就能够知道数据的哪个 key 变了，去修改对应的 DOM。
+
+React 是虚拟 DOM 方案，用 JS 对象描述 DOM 树，这个对象就像数据和实际 DOM 的一个缓存层，通过管理这个对象的变化，来减少对实际 DOM 的操作。
+
+描述实际 DOM 的虚拟 DOM 对象如下：
+
+DOM:
+
+```html
+<div id="app">
+  <p class="item">Item1</p>
+  <div class="item">Item2</div>
+</div>
+```
+
+虚拟 DOM：
+
+```js
+{
+  tag: "div",
+  attrs: {
+    id: "app"
+  },
+  children: [
+    {
+      tag: "p",
+      attrs: { className: "item" },
+      children: ["Item1"]
+    },
+    {
+      tag: "div",
+      attrs: { className: "item" },
+      children: ["Item2"]
+    }
+  ]
+}
+```
+
+数据变化的时候生成一个新的虚拟 DOM 数据，对比之前的虚拟 DOM 进行 diff 计算，算出要修改的 DOM，再对页面进行操作。
+
+通知页面更新的方式不同：
+
+- vue 中，数据变化，框架主动告诉你修改了哪些数据；
+- react 中，变化变化后，通过新老数据的计算 Diff 来得知哪些数据发生变化
+
+性能问题：
+
+- vue 的响应式，在项目大了之后，每个数据都有一个 watcher 会影响性能
+- 如果 react 虚拟 dom 过于庞大，使得 diff 计算时间大于 16.6 ms(屏幕刷新率 60HZ, 1/60)，可能造成性能卡顿。
+
+为了解决性能问题， Vue 和 react 走了不同的道路。
+
+- react 借鉴操作系统时间分片概念，引入 Fiber 架构。把整个虚拟 DOM 树 微观化，变成链表，然后利用浏览器的空闲时间计算 diff。
+- vue1 的问题在于响应式数据过多，会带来内存占用过多的问题。vue2 引入虚拟 DOM 来解决响应式数据过多问题。
+
+响应式数据是主动推送变化，虚拟 DOM 是被动计算数据的 diff。vue2 将两者结合在一起，在组件级别来划分。
+
+组件间的变化，通过响应式来通知更新。组件内部的数据变化，通过虚拟 DOM 去更新页面。最终，把响应式监听器控制在组件级别，而虚拟 DOM 的量级控制在组件的大小。
+
+在模板书写上，vue 和 react 分别走了 template 和 jsx 两个路线。
+
+- react 世界只有 jsx，最终 jsx 都会在 Compiler 那层，即工程化那里编译成 js 来执行。
+- vue 默认 template。vue3 优秀的其中一点是在虚拟 DOM 的静态标记上做到了极致，让静态的部分越过虚拟 DOM 的计算，真正做到按需更新，很好的提高了性能。
+
+## Vue3 的新特性
+
+### 响应式系统
+
+Vue 2 的响应式机制是基于 Object.defineProperty() 这个 API 实现的.Vue3 是基于 proxy。两者区别是 defineProperty 是拦截具体某个属性，
+Proxy 是全部拦截，是代理。
+
+defineProperty 示例如下：
+
+```js
+Object.defineProperty(obj, "title", {
+  get() {},
+  set() {}
+});
+```
+
+当读取 obj.title 和修改 obj.title 的时候被 defineProperty 拦截，但 defineProperty 对不存在的属性无法拦截，所以 Vue 2 中所有数据必须要在
+data 里声明。
+
+但是，Vue 不能检测到对象属性的添加或删除。因为 Vue 在初始化实例时将属性转为 getter/setter，所以属性必须在 data 对象上才能让 Vue 转换它，才能让它是响应的。需要额外的
+$set。
+
+Proxy API 是真正的代理，示例如下：
+
+```js
+new Proxy(obj, {
+  get() {},
+  set() {}
+});
+```
+
+Proxy 拦截 obj 这个数据，不关心 obj 里面属性，统一拦截。
+
+### 自定义渲染器
+
+vue2 内部所有模块是揉在一起，导致不好扩展。vue3 采用 monorepo 方式进行拆包，响应式、编译和运行时全部独立。独立出来的响应式，甚至可以在 react、node 中使用。
+
+![vue 架构](/img/2022-01-24-1.png)
+
+渲染逻辑拆成 **平台无关渲染逻辑** 和 **浏览器渲染 API**。
+
+### 全部模块使用 TS 重构
+
+Vue2 使用 Flow.js 做类型检测；Flow.js 已被抛弃，vue3 选择 TS。
+
+### Composition API 组合语法
+
+vue2 中示例：
+
+```js
+let App = {
+  data() {
+    return { count: 1 };
+  },
+  methods: {
+    add() {
+      this.count++;
+    }
+  },
+  computed: {
+    double() {
+      return this.count * 2;
+    }
+  }
+};
+```
+
+vue2 中 Options API 存在以下问题：
+
+- 所有数据都挂载在 this 上，Options API 写法对 TS 类型推导不友好。
+- 新增的功能基本都要修改 data、method 等，代码行数多了以后，会经常需要上下反复横跳。
+- 代码不好复用，vue2 的组件很难抽离通用逻辑，只能使用 mixin，还会导致命名冲突问题。
+
+vue3 中采用新增的 setup 写法：
+
+```js
+const { reactive, computed } = Vue;
+let App = {
+  setup() {
+    const state = reactive({ count: 1 });
+    function add() {
+      state.count++;
+    }
+    const double = computed(() => state.count * 2);
+    return { state, add, double };
+  }
+};
+```
+
+Composition API 好处如下：
+
+- 所有 API 都是 import 引入。对 Tree-shaking 很友好，没用到功能，打包的时候会被清理掉 ，减小包的大小
+- 一个功能模块的 methods、data 放一起书写，避免上下反复横跳。
+- 代码复用方便，一个功能的所有 methods、data 封装在一个独立的函数里。
+- Composotion API 新增的 return 等语句，在实际项目中使用。
+
+![Composition API](/img/2022-01-24-2.png)
+
+### 新的组件
+
+Vue 3 还内置了 Fragment、Teleport 和 Suspense 三个新组件。
+
+- Fragment: Vue 3 组件不再要求有一个唯一的根节点，清除了很多无用的占位 div。
+- Teleport: 允许组件渲染在别的元素内，主要开发弹窗组件的时候特别有用。
+- Suspense: 异步组件，更方便开发有异步请求的组件。
+
+### 新一代工程化工具 Vite
+
+webpack 工程化的原理是 根据 import
+依赖逻辑形成一个依赖图，然后调用对应的处理工具，把整个项目打包后，放在内存中再启动调试。因为要预打包，复杂项目开发时，启动开发环境和热更新时间都比较长，Vite 就是为了解决这个问题而出现的。
+
+现代浏览器已经默认支持 ES6 的 import 语法，Vite 就是基于这个原理实现的。
+
+在开发环境下，不需要全部预打包，只要把首页依赖的文件，依次通过网络请求去获取，开发体验得到巨大提升，做到复杂项目时，也能做到秒级调试和热更新。
+
+webpack 工作原理如下，需要把所有路由依赖打包后，才能开始调试。
+
+![webpack 工作原理](/img/2022-01-24-3.png)
+
+Vite 工作原理，根据首页的依赖模块，再去获取路由 1 的模块，按需加载。
+
+![Vite 工作原理](/img/2022-01-24-4.png)
+
+## Vue3 响应式机制
+
+响应式原理：Vue 中用过三种响应式解决方案，分别是 defineProperty、Proxy 和 value setter。
+
+---
+
+todo: 07
+
+## Vue3 实践常见问题汇总
+
+1. vetur 报错， xx has no export.
+
+   使用 Vue3 `script setup` 语法糖时,VsCode 插件 Vetur 会报该错误，原因是 Vetur(v0.35.0) 暂不支持 ts。
+
+   解决办法： 卸载 Vetur， 用 Volar(尤大推荐) 以取代 Vetur。
+
+---
+
+上述笔记源于学习极客时间-大圣的 [玩转 Vue3 全家桶](http://gk.link/a/115Qp) 课程笔记整理。
+
+---

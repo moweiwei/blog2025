@@ -1,0 +1,826 @@
+---
+updateTime: "2023-03-24 17:44"
+date: "2023-03-24"
+desc: "整理 TypeScript 常见语法、类型体操与应用示例。"
+tags: "interview/typescript"
+outline: deep
+---
+
+## 声明空间
+
+ts 中有两种：类型声明空间与变量声明空间
+
+类型声明空间：
+
+```ts
+class Foo {}
+interface Bar {}
+type Bas = {};
+```
+
+如下当做类型注解使用
+
+```ts
+let foo: Foo;
+let bar: Bar;
+let bas: Bas;
+```
+
+定义 interface Bar {} 不能当做变量来用，因为它没有定义在变量声明空间中。
+
+## 模块
+
+如下方式定义在 **全局模块** 中
+
+```ts
+const foo = 123;
+```
+
+如下方式文件的根级别位置含有 import 或者 export,在文件中创建本地作用域，是定义在 **文件模块** 中
+
+```ts
+export const foo = 123;
+```
+
+## 命名空间
+
+命名空间一个最明确的目的就是解决重名问题。
+
+命名空间是位于全局命名空间下的一个普通的带有名字的 JavaScript 对象。作用是将一系列相关的全局变量组织到一个对象的属性。
+
+```ts
+namespace Letter { 
+  export let a = 1; 
+  export let b = 2; 
+}
+```
+
+编译成 js 如下：
+
+```ts
+var Letter; 
+(function (Letter) { 
+    Letter.a = 1; 
+    Letter.b = 2; 
+})(Letter || (Letter = {}));
+```
+
+## 动态导入表达式 import()
+
+import() 异步加载一个模块, 该语句用于 Webpack Code Splitting。
+
+```ts
+import(/* webpackChunkName: "momentjs" */ 'moment')
+  .then(moment => {
+    const time = moment().format();
+    console.log('TypeScript >= 2.4.0 Dynamic Import Expression:');
+    console.log(time);
+  })
+  .catch(err => {
+    console.log('Failed to load moment', err);
+  });
+```
+
+## TS 类型系统
+
+原始类型 string、number、boolean 可以被用作类型注解。
+
+## 数组
+
+两种方式定义数组：
+
+1、元素类型后加 []
+
+```ts
+let list: number[] = [1, 2, 3];
+```
+
+2、 数组泛型 Array<元素类型>
+
+```js
+let list: Array<number> = [1, 2, 3];
+```
+
+## 接口
+
+合并众多类型声明至一个类型声明
+
+```ts
+interface Name {
+  first: string;
+  second: string;
+}
+
+let name: Name = {
+  first: 'John',
+  second: 'Doe'
+};
+```
+
+## 内联类型注解
+
+```ts
+let name: {
+  first: string;
+  second: string;
+};
+
+name = {
+  first: 'John',
+  second: 'Doe'
+};
+```
+
+内联类型注解可以省去为类型起名的麻烦。
+
+如果你发现需要多次使用相同的内联注解时，那么考虑把它重构为一个接口（或者是 type alias)
+
+## 特殊类型
+
+any、 null、 undefined 以及 void
+
+:void 来表示一个函数没有一个返回值
+
+```ts
+function log(message: string): void {
+  console.log(message);
+}
+```
+
+## 泛型
+
+在定义函数、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型的一种特性。
+
+```ts
+function reverse<T>(items: T[]): T[] {
+  const toreturn = [];
+  for (let i = items.length - 1; i >= 0; i--) {
+    toreturn.push(items[i]);
+  }
+  return toreturn;
+}
+```
+
+## 联合类型
+
+多种类型之一
+
+```ts
+function formatCommandline(command: string[] | string) {
+  let line = '';
+  if (typeof command === 'string') {
+    line = command.trim();
+  } else {
+    line = command.join(' ').trim();
+  }
+
+  // Do stuff with line: string
+}
+```
+
+## 交叉类型
+
+extend 是一种非常常见的模式，从两个对象中创建一个新对象，新对象拥有着两个对象所有的功能。
+
+```ts
+function extend<T extends object, U extends object>(first: T, second: U): T & U {
+  const result = <T & U>{};
+  for (let id in first) {
+    (<T>result)[id] = first[id];
+  }
+  for (let id in second) {
+    if (!result.hasOwnProperty(id)) {
+      (<U>result)[id] = second[id];
+    }
+  }
+
+  return result;
+}
+
+const x = extend({ a: 'hello' }, { b: 42 });
+
+// 现在 x 拥有了 a 属性与 b 属性
+const a = x.a;
+const b = x.b;
+```
+
+## 元祖类型 Tuple
+
+固定长度的，元素数据类型不同的数组。数据不可变。
+
+```js
+type FixedArray = [string, number, string];
+
+const mixedArray: FixedArray = ['a', 2, 'c'];
+```
+
+## 类型别名
+
+以为任意的类型注解提供类型别名,在联合类型和交叉类型中比较实用。
+
+```ts
+type StrOrNum = string | number;
+
+// 使用
+let sample: StrOrNum;
+sample = 123;
+sample = '123';
+
+// 会检查类型
+sample = true; // Error
+```
+
+```ts
+type Text = string | { text: string };
+type Coordinates = [number, number];
+type Callback = (data: string) => void;
+```
+
+## @types
+
+通过 npm 来安装使用 @types,如 `npm install @types/jquery --save-dev`
+
+## declare 声明文件
+
+.d.ts文件是ts用来声明变量，模块，type，interface等等的。
+
+在这种后缀的ts文件声明这些东西和在纯ts文件声明这些东西又什么区别呢？
+
+在.d.ts声明变量或者模块等东西之后，在其他地方可以不用import导入这些东西就可以直接用，用，而且有语法提示。
+
+declare声明一个类型:
+
+```ts
+declare type Asd {
+    name: string;
+}
+```
+
+在tsconfig.json文件里面的include数组里面添加这个文件, 在include包含的文件范围内可以直接使用Asd这个type。
+
+declare声明一个模块:
+
+```ts
+declare module '*.css';
+declare module '*.less';
+declare module '*.png';
+```
+
+编译ts文件的时候，导入一个.css/.less/.png格式的文件，如果没有经过declare的话是会提示语法错误的
+
+declare声明一个变量:
+
+在项目中引入了一个sdk，这个sdk（我们以微信的sdk为例）里面有一些全局的对象（比如wx），但是如果不经过任何的声明，在ts文件里面直接用wx.config()的话，肯定会报错。
+
+declare声明一个作用域:
+
+```ts
+declare namespace API {
+    interface ResponseList {}
+}
+```
+
+声明完之后在其他地方的ts就可以直接API.ResponseList引用到这个接口类型
+
+## 接口
+
+两种声明方式：
+
+```ts
+// 内联注解
+declare const myPoint: { x: number; y: number };
+
+// 接口形式
+interface Point {
+  x: number;
+  y: number;
+}
+declare const myPoint: Point;
+```
+
+接口形式的好处在于，如果有人创建了一个基于 myPoint 的库来添加新成员, 可以轻松将此成员添加到 myPoint 的现有声明中
+
+```ts
+// Lib a.d.ts
+interface Point {
+  x: number,
+  y: number
+}
+declare const myPoint: Point
+
+// Lib b.d.ts
+interface Point {
+  z: number
+}
+
+// Your code
+myPoint.z // Allowed!
+```
+
+## 函数重载
+
+函数重载，必须要把精确的定义放在前面，最后函数实现时，需要使用 |操作符或者?操作符，把所有可能的输入类型全部包含进去，以具体实现。
+
+```ts
+// 上边是声明
+function add (arg1: string, arg2: string): string
+function add (arg1: number, arg2: number): number
+// 因为我们在下边有具体函数的实现，所以这里并不需要添加 declare 关键字
+
+// 下边是实现
+function add (arg1: string | number, arg2: string | number) {
+  // 在实现上我们要注意严格判断两个参数的类型是否相等，而不能简单的写一个 arg1 + arg2
+  if (typeof arg1 === 'string' && typeof arg2 === 'string') {
+    return arg1 + arg2
+  } else if (typeof arg1 === 'number' && typeof arg2 === 'number') {
+    return arg1 + arg2
+  }
+}
+```
+
+函数重载的意义在于能够让你知道传入不同的参数得到不同的结果，如果传入的参数不同，但是得到的结果（类型）却相同，那么不要使用函数重载（没有意义）。 如果函数的返回值类型相同，那么也不需要使用函数重载
+
+以下场景可以不需要重载：
+
+```ts
+function func (a: number): number
+function func (a: number, b: number): number
+
+// 像这样的是参数个数的区别，我们可以使用可选参数来代替函数重载的定义
+
+function func (a: number, b?: number): number
+```
+
+```ts
+// 亦或是一些参数类型的区别导致的
+function func (a: number): number
+function func (a: string): number
+
+// 这时我们应该使用联合类型来代替函数重载
+function func (a: number | string): number
+```
+
+## 函数声明
+
+在没有提供函数实现的情况下，有两种声明函数类型的方式:
+
+```ts
+type LongHand = {
+  (a: number): number;
+}; //当你想使用函数重载时, 只能用此方式
+
+type ShortHand = (a: number) => number;
+```
+
+## 可调用的类型注解
+
+使用类型别名或者接口来表示一个可被调用的类型注解：
+
+```ts
+interface ReturnString {
+  (): string;
+}
+// 表示一个返回值为 string 的函数：
+```
+
+```ts
+declare const foo: ReturnString;
+
+const bar = foo(); // bar 被推断为一个字符串。
+```
+
+## 类型断言
+
+ts 允许你覆盖它的推断，并且能以你任何你想要的方式分析它
+
+js 迁移到 ts 时常见：
+
+```ts
+const foo = {};
+foo.bar = 123; // Error: 'bar' 属性不存在于 ‘{}’
+foo.bas = 'hello'; // Error: 'bas' 属性不存在于 '{}'
+```
+
+foo 类型推断为 {}，不存在属性。通过类型断言来避免该问题
+
+```ts
+interface Foo {
+  bar: number;
+  bas: string;
+}
+
+const foo = {} as Foo;
+foo.bar = 123;
+foo.bas = 'hello';
+```
+
+## 允许额外的属性
+
+包含索引签名，以明确表明可以使用额外的属性：
+
+```ts
+let x: { foo: number, [x: string]: any };
+
+x = { foo: 1, baz: 2 }; // ok, 'baz' 属性匹配于索引签名
+```
+
+React State 中示例：
+
+```ts
+// 假设
+interface State {
+  foo: string;
+  bar: string;
+}
+
+// 你可能想做：
+this.setState({ foo: 'Hello' }); // Error: 没有属性 'bar'
+
+// 因为 state 包含 'foo' 与 'bar'，TypeScript 会强制你这么做：
+this.setState({ foo: 'Hello', bar: this.state.bar });
+```
+
+## 类型保护
+
+ts 会推到条件块中的变量类型
+
+```ts
+function doSome(x: number | string) {
+  if (typeof x === 'string') {
+    // 在这个块中，TypeScript 知道 `x` 的类型必须是 `string`
+    console.log(x.subtr(1)); // Error: 'subtr' 方法并没有存在于 `string` 上
+    console.log(x.substr(1)); // ok
+  }
+
+  x.substr(1); // Error: 无法保证 `x` 是 `string` 类型
+}
+```
+
+in 操作符可以一个对象上是否存在一个属性，它通常也被作为类型保护使用
+
+```ts
+interface A {
+  x: number;
+}
+
+interface B {
+  y: string;
+}
+
+function doStuff(q: A | B) {
+  if ('x' in q) {
+    // q: A
+  } else {
+    // q: B
+  }
+}
+```
+
+## 字面量类型
+
+字面量类型本身不使用，在一个联合类型中组合创建一个强大的（实用的）抽象。
+
+字符串字面量：
+
+```ts
+let foo: 'Hello';
+foo = 'Bar'; // Error: 'bar' 不能赋值给类型 'Hello'
+```
+
+```ts
+type CardinalDirection = 'North' | 'East' | 'South' | 'West';
+
+function move(distance: number, direction: CardinalDirection) {
+  // ...
+}
+
+move(1, 'North'); // ok
+move(1, 'Nurth'); // Error
+```
+
+boolean 和 number 的字面量类型：
+
+```ts
+type OneToFive = 1 | 2 | 3 | 4 | 5;
+type Bools = true | false;
+```
+
+## Readonly
+
+```ts
+function foo(config: { readonly bar: number, readonly bas: number }) {
+  // ..
+}
+
+type Foo = {
+  readonly bar: number;
+  readonly bas: number;
+};
+```
+
+这有一个 Readonly 的映射类型，它接收一个泛型 T，用来把它的所有属性标记为只读类型：
+
+```ts
+type Foo = {
+  bar: number;
+  bas: number;
+};
+
+type FooReadonly = Readonly<Foo>;
+```
+
+## 泛型2
+
+创建泛型类
+
+```ts
+// 创建一个泛型类
+class Queue<T> {
+  private data: T[] = [];
+  push = (item: T) => this.data.push(item);
+  pop = (): T | undefined => this.data.shift();
+}
+
+// 简单的使用
+const queue = new Queue<number>();
+queue.push(0);
+queue.push('1'); // Error：不能推入一个 `string`，只有 number 类型被允许
+```
+
+泛型的误用：近在单个参数或一个位置被使用
+
+```ts
+declare function foo<T>(arg: T): void;  
+// 
+declare function foo(arg: any): void;
+```
+
+axios 请求中 泛型的使用：
+
+通常情况下，我们会把后端返回数据格式单独放入一个 interface 里：
+
+```ts
+// 请求接口数据
+export interface ResponseData<T = any> {
+  /**
+   * 状态码
+   * @type { number }
+   */
+  code: number;
+
+  /**
+   * 数据
+   * @type { T }
+   */
+  result: T;
+
+  /**
+   * 消息
+   * @type { string }
+   */
+  message: string;
+}
+```
+
+```ts
+// 在 axios.ts 文件中对 axios 进行了处理，例如添加通用配置、拦截器等
+import Ax from './axios';
+
+import { ResponseData } from './interface.ts';
+
+export function getUser<T>() {
+  return Ax.get<ResponseData<T>>('/somepath')
+    .then(res => res.data)
+    .catch(err => console.error(err));
+}
+```
+
+写入返回的数据类型 User
+
+```ts
+interface User {
+  name: string;
+  age: number;
+}
+
+async function test() {
+  // user 被推断出为
+  // {
+  //  code: number,
+  //  result: { name: string, age: number },
+  //  message: string
+  // }
+  const user = await getUser<User>();
+}
+```
+
+## never 类型
+
+常用在
+
+- 从来不会有返回值的函数（如：如果函数内含有 while(true) {}）
+- 总是会抛出错误的函数 throw new Error
+
+never 类型仅能被赋值给另外一个 never
+
+```ts
+let bar: never = (() => {
+  throw new Error('Throw my hands in the air like I just dont care');
+})();
+```
+
+void 和 never 的区别：
+
+- void 表示没有任何类型，never 表示永远不存在的值的类型。
+- 当一个函数返回空值时，它的返回值为 void 类型，但是，当一个函数永不返回时（或者总是抛出错误），它的返回值为 never 类型。
+- void 类型可以被赋值，但是除了 never 本身以外，其他任何类型不能赋值给 never。
+
+## redux 中的联合类型
+
+```ts
+import { createStore } from 'redux';
+
+type Action =
+  | {
+      type: 'INCREMENT';
+    }
+  | {
+      type: 'DECREMENT';
+    };
+
+//reducer
+function counter(state = 0, action: Action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return state + 1;
+    case 'DECREMENT':
+      return state - 1;
+    default:
+      return state;
+  }
+}
+```
+
+## 索引签名
+
+声明一个索引签名时，所有明确的成员都必须符合索引签名：
+
+```ts
+interface Bar {
+  [key: string]: number;
+  x: number;
+  y: string; // Error: y 属性必须为 number 类型
+}
+```
+
+映射类型来使索引字符串为联合类型中的一员
+
+```ts
+type Index = 'a' | 'b' | 'c';
+type FromIndex = { [k in Index]?: number };
+
+const bad: FromIndex = { b: 1, c: 2, d: 3 }; //err
+```
+
+```ts
+type FromSomeIndex<K extends string> = { [key in K]: number };
+```
+
+## 索引签名中排除某些属性
+
+用交叉类型解决
+
+```ts
+type FieldState = {
+  value: string;
+};
+
+type FromState = {
+  isValid: boolean; // Error: 不符合索引签名
+  [filedName: string]: FieldState;
+};
+```
+
+交叉类型：
+
+```ts
+type FieldState = {
+  value: string;
+};
+
+type FormState = { isValid: boolean } & { [fieldName: string]: FieldState };
+```
+
+## 流动的类型
+
+捕获变量的类型
+
+```ts
+let foo = 123;
+let bar: typeof foo; // 'bar' 类型与 'foo' 类型相同（在这里是： 'number'）
+```
+
+捕获类成员类型 需要声明一个变量
+
+```ts
+class Foo {
+  foo: number; // 我们想要捕获的类型
+}
+
+declare let _foo: Foo;
+
+// 与之前做法相同
+let bar: typeof _foo.foo;
+```
+
+捕获键的名称
+
+```ts
+const colors = {
+  red: 'red',
+  blue: 'blue'
+};
+
+type Colors = keyof typeof colors;
+
+let color: Colors; // color 的类型是 'red' | 'blue'
+color = 'red'; // ok
+color = 'blue'; // ok
+color = 'anythingElse'; // Error
+```
+
+## JSX 的支持
+
+函数组件
+
+```ts
+type Props = {
+  foo: string;
+};
+
+const MyComponent: React.FunctionComponent<Props> = props => {
+  return <span>{props.foo}</span>;
+};
+
+<MyComponent foo="bar" />;
+```
+
+类组件
+
+```ts
+type Props = {
+  foo: string;
+};
+
+class MyComponent extends React.Component<Props, {}> {
+  render() {
+    return <span>{this.props.foo}</span>;
+  }
+}
+
+<MyComponent foo="bar" />;
+```
+
+泛型组件
+
+```ts
+// 一个泛型组件
+type SelectProps<T> = { items: T[] };
+class Select<T> extends React.Component<SelectProps<T>, any> {}
+
+// 使用
+const Form = () => <Select<string> items={['a', 'b']} />;
+```
+
+泛型函数
+
+```ts
+function foo<T>(x: T): T {
+  return x;
+}
+
+// 不能使用箭头函数
+const foo = <T>(x: T) => T; // Error: T 标签没有关闭
+
+解决办法：用 extends 提示编译器这是泛型
+const foo = <T extends {}>(x: T) => x;
+```
+
+Refs
+
+一个变量时，使用 ref 和 null 的联合类型
+
+```ts
+class Use {
+  exampleRef: Example | null = null;
+
+  render() {
+    return <Example ref={exampleRef => (this.exampleRef = exampleRef)} />;
+  }
+}
+```
+
+## 参考
+
+- [深入理解 TypeScript](https://jkchao.github.io/typescript-book-chinese/)
+- [https://www.tslang.cn/docs/handbook/generics.html](https://www.tslang.cn/docs/handbook/generics.html)

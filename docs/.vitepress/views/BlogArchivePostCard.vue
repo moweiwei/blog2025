@@ -60,8 +60,7 @@ const getTitle = (post: Post): string => {
 
 // 获取文章的前两个tag
 const getTags = (post: Post) => {
-  const rawTagString: string = post.frontmatter.tags;
-  return rawTagString ? rawTagString.split("/").slice(0, 2) : [];
+  return post.tags?.slice(0, 2) ?? [];
 };
 
 // 打开文章链接

@@ -1,0 +1,244 @@
+---
+updateTime: "2022-08-05 07:19"
+date: "2022-08-05"
+desc: "讲解 useCallback 缓存函数的原理、依赖数组与实际场景。"
+tags: "interview/react/hooks"
+outline: deep
+---
+
+## 类组件，父组件传方法给子组件
+
+父组件：
+
+```jsx
+class Parent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0
+    };
+  }
+
+  handleChildren() {
+    console.log("clicked Children");
+  }
+
+  handleParent() {
+    console.log("clicked Parent");
+    this.setState((preCount) => ({ count: preCount + 1 }));
+  }
+
+  render() {
+    return (
+      <div>
+        <div
+          onClick={() => {
+            this.handleParent();
+          }}
+        >
+          Parent{" "}
+        </div>
+
+        <Children
+          handleChildren={() => {
+            this.handleChildren();
+          }}
+        />
+      </div>
+    );
+  }
+}
+```
+
+子组件：
+
+```jsx
+class Children extends PureComponent {
+  render() {
+    const { handleChildren } = this.props;
+    console.log("render Children");
+    return <div onClick={handleChildren}>Children </div>;
+  }
+}
+```
+
+每次点击 Parent，都会打印 `render Children`，子组件都会重新渲染，虽然子组件用了 PureComponent。
+
+因为父组件 setState 改变后，render() 会重新渲染，Children 组件的 handleChildren prop
+采用的是(内联函数)匿名函数赋值，导致每次的引用地址不一样,PureComponent 优化无效。
+
+正确是写法如下：
+
+```jsx
+...
+ <Children handleChildren={this.handleChildren}/>
+...
+```
+
+## 函数组件，useCallback 使用场景
+
+useCallback 在依赖不变的时候，返回的回调函数保持同一个引用地址。useCallback 的真正目的是在于缓存每次渲染时内联函数的实例。
+
+```jsx
+const Parent = () => {
+  const [count, setCount] = useState(0);
+
+  const handleParent = () => {
+    console.log("clicked Parent");
+    setCount((preCount) => preCount + 1);
+  };
+
+  const handleChildren = useCallback(() => {
+    console.log("clicked Children");
+  }, []);
+
+  return (
+    <div>
+      <div onClick={handleParent}>Parent (count:{count}) </div>
+      <Children handleChildren={handleChildren} />
+    </div>
+  );
+};
+
+const Children = memo(({ handleChildren }) => {
+  console.log("Children rending");
+  return <div onClick={handleChildren}>Children </div>;
+});
+```
+
+需要注意的是:
+
+- 单纯的 useCallback 包裹，并不能提升性能，反而会下降，useCallback 需要配合子组件优化（memo）成对使用，缺一性能都不升反降。
+
+      ```jsx
+      <!-- 
+      不管是否使用useCallback，都无法避免重新创建内部函数
+      使用 useCallback，还增加了 useCallback 内部对依赖项变化的检测
+       -->
+      function A() {
+        // ...
+        const cb = () => {}/* 创建了 */;
+
+      }
+
+      function B() {
+        // ...
+        const cb = useCallback(() => {}/*还是创建了*/, [a, b]);
+      }
+      ```
+
+## [如何从 useCallback 读取一个经常变化的值？](https://zh-hans.reactjs.org/docs/hooks-faq.html#how-to-read-an-often-changing-value-from-usecallback)
+
+有时候一个函数依赖于一个经常变化的 state ，内部函数必须经常重新创建，那缓存方法的作用就没什么意义。
+
+```jsx
+function Form() {
+  const [text, updateText] = useState("");
+
+  const handleSubmit = useCallback(() => {
+    console.log(text);
+  }, [text]); // 每次 text 变化时 handleSubmit 都会变
+
+  return (
+    <>
+      <input value={text} onChange={(e) => updateText(e.target.value)} />
+      <ExpensiveTree onSubmit={handleSubmit} />
+    </>
+  );
+}
+
+function ExpensiveTree(props) {
+  return <div onClick={props.onSubmit}>Submit</div>;
+}
+```
+
+如果你想要记住的函数是一个事件处理器并且在渲染期间没有被用到，可以把 ref 当做实例变量来用，并手动把最后提交的值保存在它当中：
+
+```jsx
+function Form() {
+  const [text, updateText] = useState("");
+  const textRef = useRef();
+
+  useEffect(() => {
+    textRef.current = text; // 把它写入 ref
+  });
+
+  const handleSubmit = useCallback(() => {
+    const currentText = textRef.current; // 从 ref 读取它
+    alert(currentText);
+  }, [textRef]); // 不要像 [text] 那样重新创建 handleSubmit
+
+  return (
+    <>
+      <input value={text} onChange={(e) => updateText(e.target.value)} />
+      <ExpensiveTree onSubmit={handleSubmit} />
+    </>
+  );
+}
+
+function ExpensiveTree(props) {
+  return <div onClick={props.onSubmit}>Submit</div>;
+}
+```
+
+上述方式可以用来达到优化的目的，但是更佳的方式是抽成自定义 Hook:
+
+```jsx
+function Form() {
+  const [text, updateText] = useState('');
+  // 即便 `text` 变了也会被记住:
+  const handleSubmit = useEventCallback(() => {
+    alert(text);
+  }, [text]);
+
+  return (
+    <>
+      <input value={text} onChange={e => updateText(e.target.value)} />
+      <ExpensiveTree onSubmit={handleSubmit} />
+    </>
+  );
+}
+
+// useEventCallback 使用了 ref 不变的特性，保证回调函数的引用永远不变。
+// 使用 useRef 来保存函数，避免 useCallback 所包裹的函数反复变化.
+function useEventCallback(fn, dependencies) {
+  const ref = useRef(() => {
+    throw new Error('Cannot call an event handler while rendering.');
+  });
+
+  // 根据依赖去更新 ref ，保证最终调用的函数是最新的
+  useEffect(() => {
+    ref.current = fn;
+  }, [fn, ...dependencies]);
+
+  return useCallback(() => {
+    const fn = ref.current;
+    return fn();
+  }, [ref]);
+}
+```
+
+## 另一种方式，就是官方推荐在 context 中向下传递 dispatch 而非在 props 中使用独立的回调
+
+useReducer返回的dispatch永远是不变的
+
+```jsx
+const TodosDispatch = React.createContext(null);
+
+function TodosApp() {
+  // 提示：`dispatch` 不会在重新渲染之间变化
+  const [todos, dispatch] = useReducer(todosReducer);
+
+  return (
+    <TodosDispatch.Provider value={dispatch}>
+      <DeepTree todos={todos} />
+    </TodosDispatch.Provider>
+  );
+}
+```
+
+- [如何避免向下传递回调？](https://zh-hans.reactjs.org/docs/hooks-faq.html#how-to-avoid-passing-callbacks-down)
+
+## Extra
+
+useCallback(fn, deps) 写法可以理解为 useMemo(() => fn, deps)

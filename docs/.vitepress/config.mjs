@@ -26,6 +26,8 @@ export default defineConfig({
       { text: "👋 关于", link: "/AboutMe.md" },
       { text: "💭 笔记", link: "/posts/index" },
       { text: "🗂 归档", link: "/Archive" },
+      { text: "📚 分类", link: "/Categories" },
+      { text: "🏷 标签", link: "/Tags" },
       { text: "☕️ 赞助", link: "/Sponsor" },
     ],
     // 顶部导航栏左侧的社交平台跳转

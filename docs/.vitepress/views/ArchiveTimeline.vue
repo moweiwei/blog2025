@@ -58,7 +58,7 @@
                 aria-hidden="true"
               ></div>
               <p class="text-xs vp-text-subtle">
-                收录于 {{ group.yearLabel }} · 点击查看详情
+                收录于 {{ group.yearLabel }}
               </p>
             </li>
           </ul>

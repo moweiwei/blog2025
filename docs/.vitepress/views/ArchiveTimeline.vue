@@ -73,29 +73,17 @@
   </section>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { computed } from "vue";
 import { data as posts } from "../utils/article.data.js";
-import type { Post } from "../utils/types.js";
 import { fileName2Title } from "../userConfig/translations.js";
-
-interface ArchiveGroup {
-  year: number;
-  yearLabel: string;
-  posts: Array<{
-    url: string;
-    title: string;
-    displayDate: string;
-    sortTime: number;
-  }>;
-}
 
 const monthDayFormatter = new Intl.DateTimeFormat("en-US", {
   month: "2-digit",
   day: "2-digit",
 });
 
-const archiveGroups = computed<ArchiveGroup[]>(() => {
+const archiveGroups = computed(() => {
   const enriched = posts
     .map((post) => {
       const parsedDate = getPostDate(post);
@@ -105,10 +93,10 @@ const archiveGroups = computed<ArchiveGroup[]>(() => {
         parsedDate,
       };
     })
-    .filter((item): item is { post: Post; parsedDate: Date } => Boolean(item))
+    .filter((item) => Boolean(item))
     .sort((a, b) => b.parsedDate.getTime() - a.parsedDate.getTime());
 
-  const map = new Map<number, ArchiveGroup>();
+  const map = new Map();
   enriched.forEach(({ post, parsedDate }) => {
     const year = parsedDate.getFullYear();
     if (!map.has(year)) {
@@ -118,7 +106,8 @@ const archiveGroups = computed<ArchiveGroup[]>(() => {
         posts: [],
       });
     }
-    const group = map.get(year)!;
+    const group = map.get(year);
+    if (!group) return;
     group.posts.push({
       url: post.url,
       title: getTitle(post),
@@ -135,14 +124,14 @@ const archiveGroups = computed<ArchiveGroup[]>(() => {
     .sort((a, b) => b.year - a.year);
 });
 
-const getPostDate = (post: Post) => {
-  const rawDate: string | undefined = post.frontmatter.date ?? post.frontmatter.updateTime;
+const getPostDate = (post) => {
+  const rawDate = post.frontmatter.date ?? post.frontmatter.updateTime;
   if (!rawDate) return null;
   const date = new Date(rawDate);
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
-const getTitle = (post: Post): string => {
+const getTitle = (post) => {
   if (post.frontmatter?.title) return post.frontmatter.title;
 
   const matches = post.url.match(/.*\/(.*.html)/);

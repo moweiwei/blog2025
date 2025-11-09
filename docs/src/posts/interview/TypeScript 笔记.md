@@ -1,10 +1,18 @@
 ---
 updateTime: "2023-03-24 17:44"
 date: "2023-03-24"
+title: "TypeScript 笔记"
 desc: "整理 TypeScript 常见语法、类型体操与应用示例。"
 tags: "interview/typescript"
 outline: deep
 ---
+
+## 2024 新特性速记
+
+- **`satisfies`**：用来校验对象是否满足某个类型而不改变推断结果，适合枚举映射、常量表这类场景；写法为 `const map = { ... } satisfies Record<string, Config>`。
+- **装饰器稳定版**：TS 5.2 起装饰器语法与 ECMAScript 草案对齐，类装饰器接收 `value`, `context` 等参数，老的 `experimentalDecorators` 将逐步淘汰。
+- **`using` 资源管理**：TS 5.2 引入 `using`/`await using` 声明，可在作用域结束时自动调用 `Symbol.dispose`，在前端可以包裹 WebGL、AudioContext 等需要显式释放的对象。
+- **协变/逆变标注**：`satisfies` 搭配模板字面量类型可以精准约束 API 路径，不再需要手写联合类型；善用 `const` 断言（`as const`）配合 `infer` 能显著降低类型体积。
 
 ## 声明空间
 

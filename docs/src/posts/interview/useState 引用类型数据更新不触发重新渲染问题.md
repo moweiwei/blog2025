@@ -1,6 +1,7 @@
 ---
 updateTime: "2024-01-09 15:33"
 date: "2024-01-09"
+title: "useState 引用类型数据更新不触发重新渲染问题"
 desc: "分析 useState 存放引用类型时的更新陷阱与解决方式。"
 tags: "interview/react/hooks"
 outline: deep
@@ -70,4 +71,10 @@ setState((prevState) => {
    }
 
    setValue((preValue) => nextValue(preValue));
-   ```
+  ```
+
+## 纠错与补充
+
+- React 只比较 `setState` 传入值的引用是否变化，即便对象内部字段不同也不会触发重新渲染；因此“修改完再 `setState(obj)`”这种模式一定失效。
+- 深拷贝可以用 `structuredClone`、`JSON.parse(JSON.stringify(obj))` 或 `lodash.cloneDeep`，但最推荐的还是 `immer`：`setState(prev => produce(prev, draft => { draft[index] = ipValue }))`，性能和可维护性都更好。
+- 如果 state 结构很复杂，考虑拆分为多个 `useState` 或使用 `useReducer`；后者的 reducer 始终接收上一份 state，可避免层层展开。

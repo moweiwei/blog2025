@@ -1,10 +1,17 @@
 ---
 updateTime: "2022-06-22 18:41"
 date: "2022-06-22"
+title: "FE-Interview"
 desc: "记录一份 21 天前端面试打卡笔记与问题拆解。"
 tags: "interview/frontend"
 outline: deep
 ---
+
+## 阅读指引
+
+- 21 天的打卡题目已经按日期划分，可以通过目录快速跳转；如果只想查某一类问题，使用搜索定位 `##` 开头的小节即可。
+- 每天的回答都保持了「问题-背景-结论-示例」四段式，建议自己在纸上写出答案再对照文档，这样更容易暴露知识盲点。
+- 需要延伸阅读的主题会在段落内附上关键词（如 “Context”、“HOC”），方便你到官方文档或 RFC 中进一步查证。
 
 ---
 
@@ -89,9 +96,7 @@ componentWillReceiveProps 同理
 
 除了 HOC，当新写一个组件，继承自一个已有的组件，可以随便修改 render 函数，使用 state、props 等改变原组件的渲染，都叫渲染劫持。
 
-PS: HOC 反向继承
-
-TODO：
+PS：HOC 的“反向继承”指的是 `const Enhanced = (Base) => class extends Base { ... }` 这种形式，增强类可以在 `render` 里直接复用 `super.render()`，甚至访问 `state`/`props`；因此劫持渲染时务必加守卫逻辑，避免无意间破坏原有生命周期。
 
 ## 6. React Intl是什么原理？
 

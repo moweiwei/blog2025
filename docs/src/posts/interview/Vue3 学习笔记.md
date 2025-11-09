@@ -1,6 +1,7 @@
 ---
 updateTime: "2023-07-08 19:25"
 date: "2023-07-08"
+title: "Vue3 学习笔记"
 desc: "概览 Vue3 核心特性、响应式 API 与实践心得。"
 tags: "interview/vue"
 outline: deep
@@ -167,6 +168,12 @@ Composition API 好处如下：
 - 一个功能模块的 methods、data 放一起书写，避免上下反复横跳。
 - 代码复用方便，一个功能的所有 methods、data 封装在一个独立的函数里。
 - Composotion API 新增的 return 等语句，在实际项目中使用。
+
+#### 组合式 API 小贴士
+
+- `setup()` 中返回到模板的响应式对象需要通过 `toRefs` 暴露，否则解构会丢失响应性；如果你只想暴露部分属性，推荐 `const { foo, bar } = toRefs(state)`。
+- 自定义组合函数命名约定 `useXxx`，内部可以自由使用 `watchEffect`、`provide/inject` 等 API，但要确保只在 `setup()` 或其他组合函数里调用，切勿在普通函数或条件语句中动态调用。
+- 如果组合函数包含副作用（如事件监听），记得在内部注册 `onMounted`/`onUnmounted` 完成绑定与清理，避免由调用方重复造轮子。
 
 ![Composition API](/img/2022-01-24-2.png)
 

@@ -1,6 +1,7 @@
 ---
 updateTime: "2022-01-14 09:32"
 date: "2022-01-14"
+title: "Antd 源码分析之 useFetchData"
 desc: "梳理 ProTable useFetchData 源码流程与扩展点，帮助理解数据请求生命周期。"
 tags: "interview/antd"
 outline: deep
@@ -279,3 +280,10 @@ const useFetchData = (
 
 export default useFetchData;
 ```
+
+## 纠错与补充
+
+- `getData` 的返回值必须是 `{ data, success, total }` 这样的对象，很多同学直接返回数组，导致 `success === undefined` 被当做失败被拦截，调试时要先确认 `request` 层协议是否满足 ProTable 约定。
+- `manual` 只会阻止首次自动请求，后续如果依赖数组 `effects` 变化仍会触发；若想彻底手动驱动，需要自行控制 `effects` 并暴露 `actionRef.current?.reload()`。
+- 轮询逻辑是通过 `runFunction(polling, msg)` 判定下一次间隔，记得在卸载或 `polling === 0` 时清理定时器，否则极易造成「卸载后仍访问 state」的警告。
+- 当关闭分页（`options.pageInfo === false`）时，不要再依赖 `pageInfo` 去算 `total`，而是直接使用接口返回的 `total` 或者 `responseData.length`，否则 `setPageInfo` 会把 `undefined` 注入导致报错。

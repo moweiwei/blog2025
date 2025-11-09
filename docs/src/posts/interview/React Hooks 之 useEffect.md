@@ -1,6 +1,7 @@
 ---
 updateTime: "2022-10-18 21:03"
 date: "2022-10-18"
+title: "React Hooks 之 useEffect"
 desc: "总结 useEffect 的执行时机、依赖管理以及清理函数。"
 tags: "interview/react/hooks"
 outline: deep
@@ -598,9 +599,16 @@ const useDataApi = (initialUrl, initialData) => {
     setUrl(url)
   }
 
-  return { ...state, doFetch }
+return { ...state, doFetch }
 }
 ```
+
+## 纠错与补充
+
+- `useEffect` 默认每次渲染后都会执行一次，只有依赖数组满足浅比较时才会跳过；想让它只运行一次，必须传入 `[]` 并确保逻辑对“严格模式下的双执行”是幂等的。
+- 清理函数的执行顺序是「新 effect 运行前先执行旧清理，再运行新 effect」，因此如果在清理里触发异步请求或埋点，要注意它可能会在组件仍然可见时发生。
+- 不要直接让 effect 回调成为 `async` 函数——那样返回的是 Promise 而不是清理函数；正确做法是在 effect 内部声明 async 函数再调用，或改写成 `use`/`Suspense` 方案。
+- 依赖数组应该列出 effect 中用到的所有响应式值，真的无法列出时，用 `useRef` 手动跟踪或把副作用拆分；随意忽略依赖只会换来偶发的陈旧数据。
 
 ## 参考资料
 

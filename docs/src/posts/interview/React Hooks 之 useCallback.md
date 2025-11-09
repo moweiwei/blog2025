@@ -1,6 +1,7 @@
 ---
 updateTime: "2022-08-05 07:19"
 date: "2022-08-05"
+title: "React Hooks 之 useCallback"
 desc: "讲解 useCallback 缓存函数的原理、依赖数组与实际场景。"
 tags: "interview/react/hooks"
 outline: deep
@@ -242,3 +243,9 @@ function TodosApp() {
 ## Extra
 
 useCallback(fn, deps) 写法可以理解为 useMemo(() => fn, deps)
+
+## 纠错与补充
+
+- `useCallback` 只负责缓存函数引用，无法阻止组件重新渲染；组件是否重新渲染取决于父组件本身和 `memo`/`useMemo` 的使用情况，不要把 `useCallback` 当作性能银弹。
+- 依赖数组必须覆盖闭包里用到的所有响应式数据（state、props、context、模块变量），否则会出现陈旧闭包；如果依赖非常频繁且函数只用于事件回调，可用 `useRef` 包装的 `useEventCallback` 或 React 19 的 `useEvent`.
+- 对于 Context 提供的 `dispatch`，React 保证其引用稳定，因此无需额外用 `useCallback` 包裹；真正需要的是确保 reducer 中的业务逻辑是纯函数，避免因共享引用导致难以追踪的副作用。

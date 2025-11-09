@@ -1,6 +1,7 @@
 ---
 updateTime: "2023-09-14 14:02"
 date: "2023-09-14"
+title: "Webpack 原理分析"
 desc: "梳理 Webpack 构建流程、模块机制与优化思路。"
 tags: "interview/build"
 outline: deep
@@ -107,3 +108,9 @@ module.exports = {
 - clean-wenpack-plugin 清理每次打包下没有使用的文件
 
 ## webpack 插件如何实现
+
+## 6. Tree Shaking 与 sideEffects
+
+- Tree Shaking 基于 ES Module 的静态分析，只会移除“未被引用”的导出，不会分析函数是否有副作用；因此库作者需要在 `package.json` 标记 `"sideEffects": false | string[]`，告诉 webpack 某些文件不能删。
+- 如果项目里有 CSS/Polyfill 等“导入即执行”的模块，要么把它们列在 `"sideEffects"` 中，要么改为在业务代码里显式调用函数返回值，否则生产构建可能会被摇掉。
+- Babel 转译可能把 `import` 转成 `require`，导致失去 Tree Shaking 能力；需要确保 `@babel/preset-env` 的 `modules: false`，交给 webpack 去处理模块语法。

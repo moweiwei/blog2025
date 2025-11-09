@@ -1,6 +1,7 @@
 ---
 updateTime: "2024-08-30 13:54"
 date: "2024-08-30"
+title: "如何在 class 组件中使用 hooks"
 desc: "介绍在类组件体系中复用 Hooks 能力的方案。"
 tags: "interview/react/hooks"
 outline: deep
@@ -8,7 +9,7 @@ outline: deep
 
 解决办法
 
-以一个简单的 `useScreenWidthhook` 函数为例，它的目的是获取全屏的宽度，并且去监听浏览器窗口的变化，更新宽度：
+以一个简单的 `useScreenWidth` Hook 为例，它的目的是获取全屏的宽度，并且去监听浏览器窗口的变化，更新宽度：
 
 ```jsx
 import { useEffect, useState } from "react";
@@ -102,3 +103,44 @@ export class HooksRenderProps extends React.Component {
   }
 }
 ```
+
+## 方法 3：借助外部 store + useSyncExternalStore
+
+当 Hook 内部持有的是某个可以被多个组件共享的状态（窗口尺寸、网络状态等）时，可以把这份状态抽到一个轻量 store 中，用函数组件负责订阅，再在 class 组件里通过 `subscribe` 读取：
+
+```ts
+// screenStore.ts
+type Listener = () => void;
+const listeners = new Set<Listener>();
+let width = window.innerWidth;
+
+window.addEventListener('resize', () => {
+  width = window.innerWidth;
+  listeners.forEach((l) => l());
+});
+
+export function useScreenStore() {
+  return useSyncExternalStore(
+    (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    () => width
+  );
+}
+```
+
+```ts
+const ScreenWidthConsumer = React.forwardRef<HTMLDivElement>((props, ref) => {
+  const width = useScreenStore();
+  return <div ref={ref}>{width}</div>;
+});
+
+export class ScreenDashboard extends React.Component {
+  render() {
+    return <ScreenWidthConsumer />;
+  }
+}
+```
+
+`useSyncExternalStore` 能确保在并发模式下订阅与读取是原子的，避免 render props/HOC 多包一层带来的嵌套地狱。

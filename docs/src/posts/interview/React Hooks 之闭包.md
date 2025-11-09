@@ -1,6 +1,7 @@
 ---
 updateTime: "2022-12-29 13:27"
 date: "2022-12-29"
+title: "React Hooks 之闭包"
 desc: "分析 Hooks 闭包陷阱产生的原因与解决套路。"
 tags: "interview/react/hooks"
 outline: deep
@@ -98,3 +99,9 @@ setCount(alwaysActualStateValue => newStateValue);
 ## References
 
 - [https://overreacted.io/zh-hans/a-complete-guide-to-useeffect/](https://overreacted.io/zh-hans/a-complete-guide-to-useeffect/)
+
+## 纠错与补充
+
+- 闭包里读到的 state 总是创建该闭包那次渲染的值，跟 `setInterval`、`Promise`、`requestAnimationFrame` 等异步 API 无关；真正的问题在于我们没有把“最新值”显式存放在 ref 或 reducer 中。
+- 在定时器或订阅回调里更新 state，优先使用函数式 `setState(prev => ...)`，这样即便闭包捕获了旧的 `prev`，React 也会把你传入的函数放到更新队列中按顺序执行，避免“越加越慢”的假象。
+- React 19 引入的 `useEvent`（以及社区 `useEventCallback`）本质上就是对文中 `useRef` 模式的封装，如果是在事件处理器中读取最新值，优先采用它可以减少手写样板代码。

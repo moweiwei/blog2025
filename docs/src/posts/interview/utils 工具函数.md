@@ -1,6 +1,7 @@
 ---
 updateTime: "2024-02-22 07:51"
 date: "2024-02-22"
+title: "utils 工具函数"
 desc: "收集常用工具函数及其实现思路。"
 tags: "interview/utils"
 outline: deep
@@ -31,3 +32,35 @@ export const getType = (data: any) => {
   return Object.prototype.toString.call(data).slice(8, -1)
 }
 ```
+
+## sleep
+
+```ts
+export const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    const timer = setTimeout(() => {
+      clearTimeout(timer);
+      resolve();
+    }, ms);
+  });
+```
+
+配合 `await sleep(300)` 可以快速做重试、节流等异步节奏控制。
+
+## once
+
+```ts
+export function once<T extends (...args: any[]) => any>(fn: T) {
+  let called = false;
+  let value: ReturnType<T>;
+  return (...args: Parameters<T>) => {
+    if (!called) {
+      called = true;
+      value = fn(...args);
+    }
+    return value;
+  };
+}
+```
+
+`once` 适合初始化开销较大的逻辑，例如创建全局单例、注入脚本等。

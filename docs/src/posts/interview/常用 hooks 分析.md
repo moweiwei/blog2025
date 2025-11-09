@@ -1,6 +1,7 @@
 ---
 updateTime: "2024-10-17 18:06"
 date: "2024-10-17"
+title: "常用 hooks 分析"
 desc: "对常用自定义 hooks 的设计与场景做集中拆解。"
 tags: "interview/react/hooks"
 outline: deep
@@ -185,3 +186,61 @@ stack overflow 提问后，回答如下：
 It returns a memoized function which acts as a proxy for the function you provide as the argument.
 You would only need this when you need to update/recreate the function, but also retain a stable
 object identity for use elsewhere (e.g. a useEffect dependency array).
+
+## useThrottleFn
+
+```ts
+export const useThrottleFn = <T extends (...args: any[]) => any>(fn: T, wait = 200) => {
+  const fnRef = useRefFunction(fn);
+  const timer = useRef<NodeJS.Timeout | null>(null);
+
+  const cancel = useCallback(() => {
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
+  }, []);
+
+  const run = useCallback(
+    (...args: Parameters<T>) => {
+      if (timer.current) return;
+      timer.current = setTimeout(() => {
+        timer.current = null;
+      }, wait);
+      return fnRef(...args);
+    },
+    [wait, cancel, fnRef],
+  );
+
+  useEffect(() => cancel, [cancel]);
+
+  return { run, cancel };
+};
+```
+
+节流适合 scroll/resize 等高频事件，和防抖（`useDebounceFn`）互补。
+
+## useWhyDidYouUpdate
+
+```ts
+export function useWhyDidYouUpdate<T extends Record<string, any>>(name: string, props: T) {
+  const prevProps = useRef<T>();
+
+  useEffect(() => {
+    if (prevProps.current) {
+      const changedProps: Record<string, { from: any; to: any }> = {};
+      Object.keys({ ...prevProps.current, ...props }).forEach((key) => {
+        if (prevProps.current?.[key] !== props[key]) {
+          changedProps[key] = { from: prevProps.current?.[key], to: props[key] };
+        }
+      });
+      if (Object.keys(changedProps).length) {
+        console.log('[why-did-you-update]', name, changedProps);
+      }
+    }
+    prevProps.current = props;
+  });
+}
+```
+
+调试 `memo` 组件时非常实用，可以快速定位是哪个 prop 触发了重新渲染。

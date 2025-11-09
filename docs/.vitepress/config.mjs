@@ -23,11 +23,11 @@ export default defineConfig({
     logo: "/logo.svg",
     // 顶部导航栏
     nav: [
-      { text: "👋 关于", link: "/AboutMe.md" },
       { text: "💭 笔记", link: "/posts/index" },
       { text: "🗂 归档", link: "/Archive" },
       { text: "📚 分类", link: "/Categories" },
       { text: "🏷 标签", link: "/Tags" },
+      { text: "👋 关于", link: "/AboutMe.md" },
       { text: "☕️ 赞助", link: "/Sponsor" },
     ],
     // 顶部导航栏左侧的社交平台跳转
@@ -50,6 +50,17 @@ export default defineConfig({
   // 数学公式支持
   markdown: {
     math: true,
+  },
+  transformPageData(pageData) {
+    if (
+      pageData?.relativePath?.startsWith("posts/") &&
+      pageData.frontmatter?.sidebar !== false
+    ) {
+      pageData.frontmatter = {
+        ...pageData.frontmatter,
+        sidebar: false,
+      };
+    }
   },
   // !请勿修改
   vite: {

@@ -1,6 +1,7 @@
 ---
 updateTime: "2024-04-06 16:18"
 date: "2024-04-06"
+title: "使用 useRef 跨生命周期保存变量"
 desc: "展示 useRef 保存跨渲染状态的典型用法。"
 tags: "interview/react/hooks"
 outline: deep
@@ -161,3 +162,48 @@ const RefComponent = () => {
   );
 };
 ```
+
+## 场景 4：记录 DOM 尺寸并避免重复测量
+
+```jsx
+function useDomRect<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const rectRef = useRef<DOMRect>();
+
+  useLayoutEffect(() => {
+    if (ref.current) {
+      rectRef.current = ref.current.getBoundingClientRect();
+    }
+  });
+
+  return { ref, rect: rectRef.current };
+}
+```
+
+`useLayoutEffect` 保证在浏览器绘制前拿到尺寸，而 `rectRef` 缓存住上一次的 DOMRect，方便 diff。
+
+## 场景 5：暴露命令式句柄
+
+```ts
+export interface PhotoHandle {
+  focus: () => void;
+}
+
+const Photo = forwardRef<PhotoHandle>((props, ref) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useImperativeHandle(ref, () => ({
+    focus() {
+      inputRef.current?.focus();
+    },
+  }));
+  return <input ref={inputRef} />;
+});
+```
+
+Ref 不只有 DOM，它还可以承载自定义的命令式 API，通过 `useImperativeHandle` 暴露给父组件。
+
+## 纠错与补充
+
+- `useRef` 持有的对象在整个生命周期内都不会变化，因此非常适合保存“不会触发渲染的状态”；如果你发现某段逻辑需要既读又更新 UI，就应该改回 `useState`。
+- 在严格模式下 React 会执行组件初始化两次，但 `useRef` 始终返回同一个引用，因此不会重复注册事件；但你仍然需要在副作用里正确清理监听器，防止 `ref.current` 指向已经卸载的节点。
+- `useRef(null)` 并不会立刻赋值，需要到 `render` 之后 React 才会把 DOM 节点挂到 `current` 上，所以在事件回调里使用前务必判空。

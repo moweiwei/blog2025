@@ -1,9 +1,9 @@
 <template>
-  <section class="max-w-5xl px-6 py-16 mx-auto sm:px-8 lg:px-0">
+  <section class="max-w-5xl px-6 py-16 mx-auto sm:px-8 lg:px-0 vp-themed-text">
 
     <div
       v-if="isCloudVariant"
-      class="mt-12 flex flex-wrap justify-center gap-4 text-slate-700 dark:text-slate-100"
+      class="mt-12 flex flex-wrap justify-center gap-4"
     >
       <span
         v-for="group in taxonomyGroups"
@@ -16,15 +16,15 @@
       </span>
     </div>
 
-    <div v-else class="mt-14 max-w-3xl mx-auto space-y-10 dark:text-slate-100">
+    <div v-else class="mt-14 max-w-3xl mx-auto space-y-10">
       <article
         v-for="group in taxonomyGroups"
         :key="group.id"
         :id="group.id"
-        class="p-6 transition border rounded-2xl border-slate-200/80 bg-white/70 shadow-sm hover:-translate-y-1 hover:shadow-lg dark:bg-slate-900/60 dark:border-slate-800"
+        class="p-6 transition border rounded-2xl shadow-sm hover:-translate-y-1 hover:shadow-lg vp-themed-card"
       >
         <header
-          class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800"
+          class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b vp-themed-border"
           :class="enableGroupCollapse ? 'cursor-pointer select-none' : ''"
           :tabindex="enableGroupCollapse ? 0 : undefined"
           :role="enableGroupCollapse ? 'button' : undefined"
@@ -34,15 +34,15 @@
           @keydown.space.prevent="handleGroupHeaderClick(group.id)"
         >
           <div>
-            <p class="text-xs uppercase tracking-[0.3em] text-sky-500/80">
+            <p class="text-xs uppercase tracking-[0.3em] vp-text-subtle">
               {{ groupLabel }}
             </p>
-            <h2 class="text-2xl font-semibold text-slate-900 dark:text-white">
+            <h2 class="text-2xl font-semibold">
               {{ group.label }}
             </h2>
           </div>
           <span
-            class="flex items-center gap-1 px-3 py-1 text-sm font-mono rounded-full bg-sky-100 text-sky-600 dark:bg-sky-900/40 dark:text-sky-200"
+            class="flex items-center gap-1 px-3 py-1 text-sm font-mono rounded-full border vp-themed-border vp-text-subtle"
           >
             {{ group.count }} 篇
             <svg
@@ -67,17 +67,17 @@
           <li
             v-for="post in group.posts"
             :key="post.url"
-            class="flex flex-col gap-2 p-3 transition border rounded-xl border-slate-100/80 dark:border-slate-800 hover:border-sky-300 dark:hover:border-sky-600"
+            class="flex flex-col gap-2 p-3 transition border rounded-xl hover:-translate-y-0.5 vp-themed-card"
           >
             <button
               type="button"
-              class="text-left text-lg font-medium text-slate-900 hover:text-sky-600 dark:text-white dark:hover:text-sky-300"
+              class="text-left text-lg font-medium transition-colors duration-200 hover:opacity-80"
               @click="openPost(post.url)"
             >
               {{ getTitle(post) }}
             </button>
 
-            <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
+            <div class="flex flex-wrap items-center gap-3 text-sm vp-text-subtle">
               <time class="font-mono text-xs uppercase tracking-wide">{{
                 post.date.string
               }}</time>
@@ -88,7 +88,7 @@
                 <span
                   v-for="(item, idx) in getCompanions(post)"
                   :key="`${post.url}-${item}-${idx}`"
-                  class="px-2 py-0.5 text-xs rounded-full border border-slate-200 text-slate-500 dark:border-slate-700 dark:text-slate-300"
+                  class="px-2 py-0.5 text-xs rounded-full border opacity-70"
                 >
                   {{ item }}
                 </span>
@@ -100,7 +100,7 @@
 
       <p
         v-if="!taxonomyGroups.length"
-        class="py-10 text-center text-slate-500 dark:text-slate-400"
+        class="py-10 text-center vp-text-muted"
       >
         暂无可展示的数据。
       </p>

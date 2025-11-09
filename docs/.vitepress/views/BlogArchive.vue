@@ -1,6 +1,6 @@
 <template>
   <div
-    class="max-w-3xl px-4 pb-8 mx-auto my-20 sm:px-6 xl:max-w-5xl xl:px-0 dark:divide-slate-200/20"
+    class="max-w-3xl px-4 pb-8 mx-auto my-20 sm:px-6 xl:max-w-5xl xl:px-0 vp-themed-text"
   >
     <!-- 标题 -->
     <div class="relative flex justify-center mt-2">
@@ -11,7 +11,7 @@
       >
     </div>
 
-    <p class="mt-2 text-center text-black/50 dark:text-slate-500">{{ hero.subTitle }}</p>
+    <p class="mt-2 text-center vp-text-muted">{{ hero.subTitle }}</p>
 
     <!-- 主体 -->
     <section class="flex justify-center w-full pt-6 mt-6">

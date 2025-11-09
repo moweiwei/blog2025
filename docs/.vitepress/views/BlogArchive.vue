@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { useData } from "vitepress";
+import { inBrowser, useData } from "vitepress";
 import { data as posts } from "../utils/article.data.js";
 import PostCard from "./BlogArchivePostCard.vue";
 import Sidebar from "./BlogArchiveSidebar.vue";
@@ -54,8 +54,8 @@ const { frontmatter: pageData, theme } = useData();
 const { hero, types, features, flow } = pageData.value;
 
 // 根据当前 page 名称获取 sidebar 数据并构造相应的类别
-const pathname = window.location.pathname;
-const sidebarData = theme.value.sidebar?.[pathname];
+const pathname = inBrowser ? window.location.pathname : undefined;
+const sidebarData = pathname ? theme.value.sidebar?.[pathname] : undefined;
 const categories =
   types || sidebarData?.items.map((item: any) => ({ name: item.text, link: item.link }));
 

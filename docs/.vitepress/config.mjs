@@ -25,6 +25,7 @@ export default defineConfig({
     nav: [
       { text: "👋 About", link: "/AboutMe.md" },
       { text: "💭 Blogs", link: "/posts/index" },
+      { text: "🗂 归档", link: "/Archive" },
       { text: "🦄 Projects", link: "Projects.md" },
       { text: "👫 Friends", link: "Friends.md" },
     ],

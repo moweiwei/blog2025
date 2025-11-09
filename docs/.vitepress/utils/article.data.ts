@@ -11,11 +11,14 @@ export { data };
 export default createContentLoader("posts/**/*.md", {
   transform(rawData): Post[] {
     return rawData
-      .map(({ url, frontmatter }) => ({
-        url,
-        frontmatter,
-        date: formatDate(frontmatter.updateTime),
-      }))
+      .map(({ url, frontmatter }) => {
+        const rawDate = frontmatter.date ?? frontmatter.updateTime;
+        return {
+          url,
+          frontmatter,
+          date: formatDate(rawDate),
+        };
+      })
       .filter((post) => /.html/.test(post.url) && !post.frontmatter.hidden)
       .sort((a, b) => b.date.time - a.date.time);
   },

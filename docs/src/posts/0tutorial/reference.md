@@ -4,6 +4,7 @@ outline: deep
 desc: "个性化配置指南，让你拥有一个定制化的，漂漂亮亮的博客网站！"
 tags: "Tutorial"
 updateTime: "2023-10-25 14:53"
+date: "2023-10-25"
 ---
 
 # 个性化配置

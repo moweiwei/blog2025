@@ -1,5 +1,6 @@
 ---
 updateTime: "2025-11-07 16:20"
+date: "2025-11-07"
 desc: "专为前端转后端的初学者准备的详细教程"
 tags: "nest/fastify"
 outline: deep

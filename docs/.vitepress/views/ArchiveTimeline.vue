@@ -7,9 +7,6 @@
       <h1 class="mt-3 text-5xl font-bold tracking-tight text-slate-900 dark:text-white">
         归档
       </h1>
-      <p class="mt-4 text-base text-slate-500 dark:text-slate-400">
-        按年份浏览全部文章，点击标题即可跳转到正文。
-      </p>
     </div>
 
     <div

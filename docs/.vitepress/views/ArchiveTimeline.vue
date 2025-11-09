@@ -25,7 +25,7 @@
             {{ group.year }}
           </span>
           <header class="flex items-end justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-            <h2 class="text-3xl font-semibold text-slate-900 dark:text-white">
+            <h2 class="text-3xl font-semibold text-slate-900 dark:text-white z-10">
               {{ group.yearLabel }}
             </h2>
             <p class="text-sm text-slate-400">{{ group.posts.length }} 篇</p>
@@ -35,11 +35,11 @@
             <li
               v-for="post in group.posts"
               :key="post.url"
-              class="flex items-center justify-between gap-6 py-4 transition hover:bg-slate-50/60 dark:hover:bg-slate-800/40 px-1 rounded"
+              class="group flex items-center justify-between gap-6 py-2 transition hover:bg-slate-50/60 dark:hover:bg-slate-800/40 px-1 rounded"
             >
               <a
                 :href="post.url"
-                class="flex-1 text-lg font-medium text-slate-800 transition-colors duration-200 hover:text-[#3451b2] dark:text-white dark:hover:text-[#3451b2]"
+                class="flex-1 text-lg font-medium text-slate-800 transition-colors duration-200 hover:text-VPLight group-hover:text-VPLight dark:text-white dark:hover:text-VPDark dark:group-hover:text-VPDark"
               >
                 {{ post.title }}
               </a>
@@ -75,8 +75,8 @@
 
 <script setup>
 import { computed } from "vue";
-import { data as posts } from "../utils/article.data.js";
-import { fileName2Title } from "../userConfig/translations.js";
+import { data as posts } from "../utils/article.data.ts";
+import { fileName2Title } from "../userConfig/translations.ts";
 
 const monthDayFormatter = new Intl.DateTimeFormat("en-US", {
   month: "2-digit",

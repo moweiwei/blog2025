@@ -71,8 +71,7 @@ export default defineConfig({
     nav: [
       { text: "👋 About", link: "/AboutMe.md" },
       { text: "💭 Blogs", link: "/posts/index" },
-      { text: "🦄 Projects", link: "Projects.md" },
-      { text: "👫 Friends", link: "Friends.md" },
+      { text: "🗂 归档", link: "/Archive" },
     ],
   },
 });
@@ -206,48 +205,6 @@ updateTime: "2023-10-25 00:21"
 ::: tip
 如果你使用的是 VSCode，那么你可以使用 【`Insert Date String`】 这个插件来快速生成 `updateTime` 字段。该插件的默认快捷键是 `ctrl`+`alt`+`i`.
 :::
-
-## 友链
-
-这是本项目在 Vitepress 基础上新增的页面，用于展示你的社交网络与友情链接。
-
-该部分配置文件位于 `/docs/.vitepress/userConfig/friendsInfo.ts`
-
-以下是字段说明：
-
-```js
-  avatar: string;   // 头像链接
-  name: string;     // 好友 id
-  link: string;     // 好友的博客链接
-
-  // (可选)关于好友的简介
-  title?: string;
-  // (可选)一些有趣的标签
-  tag?: string;
-  // (可选)设置标签的颜色，可选值 'sky' | 'pink' | 'indigo' | 'orange' | 'green'
-  color?: string;
-```
-
-## 项目介绍
-
-这是本项目在 Vitepress 基础上新增的页面，用于展示你的开源项目。
-
-该部分配置文件位于 `/docs/.vitepress/userConfig/projectsInfo.ts`
-
-以下是字段说明：
-
-```js
-  // 图片链接：或许你可以放一张二次元美图()
-  banner: string;
-  // 项目的标题
-  title: string;
-  // (可选)项目标题右侧的 tag
-  tag?: string;
-  // 项目简介
-  description: string;
-  // 项目开源仓库链接
-  link: string;
-```
 
 ## 更多信息
 

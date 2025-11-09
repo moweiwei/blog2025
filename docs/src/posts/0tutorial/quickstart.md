@@ -78,15 +78,13 @@ npm run docs:dev
 ├─ docs
 │  ├─ .vitepress
 │  │  ├─ components
-│  │  ├─ userConfig // 用户数据：友链...
+│  │  ├─ userConfig // 侧边栏标题翻译配置
 │  │  └─ config.mjs // vitepress 配置入口
 │  └─ src           // 存放所有的笔记文件
 │     ├─ public     // 存放一些静态资源，它们在构建后将保留原始名称
 │     ├─ posts      // markdown 笔记文件
 │     ├─ index.md       // 主页
-│     ├─ AboutMe.md     // “关于”页
-│     ├─ Friends.md     // 友链页
-│     └─ Projects.md    // “项目”页
+│     └─ AboutMe.md     // “关于”页
 │
 ├─ tsconfig.json
 ├─ tailwind.config.js

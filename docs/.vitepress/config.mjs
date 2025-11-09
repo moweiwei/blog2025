@@ -26,8 +26,6 @@ export default defineConfig({
       { text: "👋 About", link: "/AboutMe.md" },
       { text: "💭 Blogs", link: "/posts/index" },
       { text: "🗂 归档", link: "/Archive" },
-      { text: "🦄 Projects", link: "Projects.md" },
-      { text: "👫 Friends", link: "Friends.md" },
     ],
     // 顶部导航栏左侧的社交平台跳转
     socialLinks: [{ icon: "github", link: "https://github.com/moweiwei" }],

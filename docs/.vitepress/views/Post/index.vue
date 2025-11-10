@@ -36,8 +36,8 @@
 
 <script setup lang="ts">
 import { useData } from "vitepress";
-import { data as posts } from "../utils/article.data.js";
-import PostCard from "./BlogArchivePostCard.vue";
+import { data as posts } from "../../utils/article.data.js";
+import PostCard from "./Card.vue";
 
 // 获取标题与布局配置
 const { frontmatter: pageData } = useData();

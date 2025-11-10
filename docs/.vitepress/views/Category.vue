@@ -1,5 +1,13 @@
 <template>
-  <section class="max-w-5xl px-6 py-16 mx-auto sm:px-8 lg:px-0 vp-themed-text">
+  <section class="max-w-5xl px-6 py-16 my-10 mx-auto sm:px-8 lg:px-0 vp-themed-text">
+    <div class="text-center">
+      <p class="text-xs font-semibold tracking-[0.35em] uppercase opacity-70 vp-themed-text">
+         {{kind}}
+      </p>
+      <h1 class="mt-4 text-4xl font-semibold tracking-tight">
+        {{title}}
+      </h1>
+    </div>
 
     <div
       v-if="isCloudVariant"

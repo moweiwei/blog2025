@@ -19,7 +19,7 @@ types:
 ---
 
 <script setup>
-import BlogArchive from '../../.vitepress/views/BlogArchive.vue'
+import Post from '../../.vitepress/views/Post/index.vue'
 </script>
 
-<BlogArchive/>
+<Post/>

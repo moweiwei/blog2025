@@ -62,8 +62,8 @@
 </template>
 
 <script setup lang="ts">
-import { type Post } from "../utils/types.js";
-import { fileName2Title } from "../userConfig/translations.js";
+import { type Post } from "../../utils/types.js";
+import { fileName2Title } from "../../userConfig/translations.js";
 import { useRouter } from "vitepress";
 
 const router = useRouter();

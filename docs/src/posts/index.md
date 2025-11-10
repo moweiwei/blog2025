@@ -4,7 +4,7 @@ sidebar: false
 
 hero:
   title: "Document"
-  subTitle: "📚 欢迎来到本项目的使用说明书"
+  subTitle: "📚 欢迎来到本博客"
 
 types:
   - name: "使用指南"

@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
             :style="{ transition: 'stroke-dashoffset 0.15s ease' }"
           />
         </svg>
-        <span class="text-[0.82rem] font-semibold text-[#222a54] md:text-[0.9rem]">
+        <span class="text-[0.82rem] font-semibold text-[#222a54] dark:text-white md:text-[0.9rem]">
           {{ paddedPercentage }}
         </span>
       </div>

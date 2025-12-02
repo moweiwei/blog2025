@@ -5,7 +5,7 @@ title: "归档"
 ---
 
 <script setup>
-import ArchiveTimeline from '../.vitepress/views/ArchiveTimeline.vue'
+import Archive from '../.vitepress/views/Archive.vue'
 </script>
 
-<ArchiveTimeline/>
+<Archive/>

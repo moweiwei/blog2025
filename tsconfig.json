@@ -4,7 +4,7 @@
     "./docs/.vitepress/userConfig/*.ts",
     "./docs/.vitepress/components/*.vue",
     "./docs/.vitepress/views/*.vue"
-  ],
+, "docs/.vitepress/views/Post/Index.vue", "docs/.vitepress/views/Post/Card.vue"  ],
   "compilerOptions": {
     "module": "NodeNext",
     "allowJs": true,

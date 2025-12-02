@@ -1,6 +1,6 @@
 <template>
   <section
-    class="max-w-5xl px-5 py-12 mx-auto my-10 sm:px-8 lg:px-0 rounded-3xl border backdrop-blur vp-themed-card"
+    class="max-w-5xl px-5 py-12 mx-auto my-10 sm:px-8 lg:px-0 rounded-3xl backdrop-blur"
   >
     <div class="text-center">
       <p class="text-xs font-semibold tracking-[0.35em] uppercase opacity-70 vp-themed-text">

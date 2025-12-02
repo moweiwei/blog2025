@@ -1,13 +1,1 @@
-<h1 align="center">🌀 easy-vitepress-blog 🏖️</h1>
-
-基于 VitePress 快速搭建个人博客，自动化路由处理并预置了更加丰富的页面。
-
-## ✨ 特性
-
-- **🚀 自动化路由脚本**：新增 Markdown 文件时无需手动设置路由，构建脚本会自动为你处理，你可以更专注于内容创作。
-- **📚 语法增强**：新增 `LinkCard` 组件，以卡片形式清晰地展示链接，提升阅读体验。
-- **🎨 优化 PDF 导出效果**：使用 Tailwind CSS 调整打印模式下的样式，使你能够导出更加美观的 PDF 文件。
-
-## 📋 开始
-
-[点击阅读使用指南](https://example.zbwer.work/)
+<h1 align="center"><a href="https://moweiwei.top">Weiwei.Mo</a></h1>

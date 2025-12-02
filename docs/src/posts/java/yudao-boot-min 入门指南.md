@@ -95,12 +95,12 @@ outline: deep
 
 ### 2.2 泛型
 
-- 什么是泛型 <T>
+- 什么是泛型 `<T>`
 - 泛型类、泛型方法
-- <?>、<? extends X>、<? super X>
+- `<?>`、`<? extends X>`、`<? super X>`
 
 **✔ 练习**：
-写一个 GenericBox<T> 用来存储任意对象。
+写一个 GenericBox`<T>` 用来存储任意对象。
 
 ### 2.3 异常机制进阶
 
@@ -125,11 +125,11 @@ outline: deep
 
 **常用注解**：
 
-- @Data
-- @Builder
-- @AllArgsConstructor
-- @NoArgsConstructor
-- @Slf4j
+- `@Data`
+- `@Builder`
+- `@AllArgsConstructor`
+- `@NoArgsConstructor`
+- `@Slf4j`
 
 **✔ 练习**：
 写一个 User 实体类，使用 Lombok 减少代码。
@@ -193,8 +193,8 @@ outline: deep
 
 - Bean 是什么？
 - 如何管理对象？
-- @Component / @Service / @Controller / @RestController
-- @Autowired / @Resource 注入
+- `@Component` / `@Service` / `@Controller` / `@RestController`
+- `@Autowired` / `@Resource` 注入
 
 **✔ 练习**：
 写一个简单用户服务 UserService → Controller 调用它。
@@ -203,32 +203,32 @@ outline: deep
 
 **必须掌握注解**：
 
-- @GetMapping
-- @PostMapping
-- @RequestParam
-- @PathVariable
-- @RequestBody
+- `@GetMapping`
+- `@PostMapping`
+- `@RequestParam`
+- `@PathVariable`
+- `@RequestBody`
 
 **✔ 练习**：
 实现 UserController：注册、登录、查询。
 
 ### 4.3 配置文件
 
-- application.yml
-- 环境切换：application-dev.yml、application-prod.yml
-- server.port
+- `application.yml`
+- 环境切换：`application-dev.yml`、`application-prod.yml`
+- `server.port`
 - 数据库连接配置
 
 ### 4.4 Spring Boot 自动装配（简单理解）
 
-- @SpringBootApplication 本质
+- `@SpringBootApplication` 本质
 - Spring Boot Starter 机制
 - （yudao 很多 starter，用来做自动配置）
 
 ### 4.5 Swagger / Knife4j
 
 - 接口文档自动生成
-- 注解：@Api、@ApiModel 等
+- 注解：`@Api`、`@ApiModel` 等
 
 **✔ 练习**：
 为你的 UserController 生成文档。
@@ -251,20 +251,20 @@ outline: deep
 
 ### 5.2 MyBatis 基础
 
-- @Mapper
+- `@Mapper`
 - Mapper 接口
 - XML 定义 SQL
-- #{} vs ${}
+- `#{}` vs `${}`
 
 **✔ 练习**：
 写一个 UserMapper.xml + 接口，查询 user。
 
 ### 5.3 MyBatis Plus（MP）
 
-- BaseMapper
-- QueryWrapper
-- LambdaQueryWrapper
-- 自动 CRUD（insert，selectById）
+- `BaseMapper`
+- `QueryWrapper`
+- `LambdaQueryWrapper`
+- 自动 CRUD（`insert`，`selectById`）
 
 **✔ 练习**：
 用 MP 完成一个查询分页接口。

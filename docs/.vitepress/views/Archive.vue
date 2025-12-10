@@ -3,12 +3,12 @@
     class="max-w-5xl px-5 py-12 mx-auto my-10 sm:px-8 lg:px-0 rounded-3xl backdrop-blur"
   >
     <div class="text-center">
-      <p class="text-xs font-semibold tracking-[0.35em] uppercase opacity-70 vp-themed-text">
+      <p
+        class="text-xs font-semibold tracking-[0.35em] uppercase opacity-70 vp-themed-text"
+      >
         Archive
       </p>
-      <h1 class="mt-4 text-4xl font-semibold tracking-tight">
-        归档
-      </h1>
+      <h1 class="mt-4 text-4xl font-semibold tracking-tight">归档</h1>
     </div>
 
     <div class="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_180px] lg:gap-16">
@@ -57,16 +57,12 @@
                 :style="{ backgroundColor: 'var(--vp-c-bg-soft)' }"
                 aria-hidden="true"
               ></div>
-              <p class="text-xs vp-text-subtle">
-                收录于 {{ group.yearLabel }}
-              </p>
+              <p class="text-xs vp-text-subtle">收录于 {{ group.yearLabel }}</p>
             </li>
           </ul>
         </article>
       </div>
-      <p v-else class="text-center vp-text-muted">
-        暂无可展示的文章。
-      </p>
+      <p v-else class="text-center vp-text-muted">暂无可展示的文章。</p>
 
       <aside class="hidden lg:block">
         <p
